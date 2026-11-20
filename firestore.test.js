@@ -87,7 +87,7 @@ test("Authenticated owner: UserProfile create, partial update, ghost-field & imm
   await assertSucceeds(aliceDb.collection("users").doc(ALICE_UID).get());
   await assertFails(aliceDb.collection("users").get());
 
-  // Valid partial update succeeds (including daily streak persistence)
+  // Valid partial update succeeds (including daily streak, focus time & XP persistence)
   await assertSucceeds(
     aliceDb.collection("users").doc(ALICE_UID).update({
       examDate: "2027-01-15",
@@ -96,14 +96,28 @@ test("Authenticated owner: UserProfile create, partial update, ghost-field & imm
       currentStreak: 4,
       bestStreak: 7,
       lastStudyDate: "2026-11-19",
+      totalFocusMinutes: 50,
+      focusPoints: 130,
       updatedAt: new Date(Date.now() - 1000),
     })
   );
 
-  // Negative streak fails validation
+  // Negative streak, focus minutes, or points fail validation
   await assertFails(
     aliceDb.collection("users").doc(ALICE_UID).update({
       currentStreak: -1,
+      updatedAt: new Date(Date.now() - 500),
+    })
+  );
+  await assertFails(
+    aliceDb.collection("users").doc(ALICE_UID).update({
+      totalFocusMinutes: -5,
+      updatedAt: new Date(Date.now() - 500),
+    })
+  );
+  await assertFails(
+    aliceDb.collection("users").doc(ALICE_UID).update({
+      focusPoints: -10,
       updatedAt: new Date(Date.now() - 500),
     })
   );
@@ -295,5 +309,59 @@ test("Authenticated owner: progress, sessions, cards, attempts, exams, notes, ta
       done: true,
       updatedAt: updated,
     })
+  );
+
+  // Flashcards (create, list query ordered by chapter, update, reject invalid bounds/unauth/cross-user)
+  await assertSucceeds(
+    aliceDb.collection("users").doc(ALICE_UID).collection("flashcards").doc("error-mistake").set({
+      term: "Error (Mistake)",
+      question: "ما المقصود بـ Error (Mistake) في منهج ISTQB؟",
+      answer: "خطأ بشري يؤدي إلى defect في work product.",
+      chapter: 1,
+      hint: "الفصل 1 · أساسيات الاختبار",
+      source: "istqb",
+      createdAt: created,
+      updatedAt: created,
+    })
+  );
+  await assertSucceeds(
+    aliceDb.collection("users").doc(ALICE_UID).collection("flashcards").orderBy("chapter").get()
+  );
+  await assertSucceeds(
+    aliceDb.collection("users").doc(ALICE_UID).collection("flashcards").doc("error-mistake").update({
+      hint: "مراجعة سريعة",
+      updatedAt: updated,
+    })
+  );
+  await assertFails(
+    aliceDb.collection("users").doc(ALICE_UID).collection("flashcards").doc("bad_ch").set({
+      term: "Bad Card",
+      question: "Invalid chapter",
+      answer: "Should fail",
+      chapter: 9,
+      source: "istqb",
+      createdAt: created,
+      updatedAt: created,
+    })
+  );
+  await assertFails(
+    aliceDb.collection("users").doc(ALICE_UID).collection("flashcards").doc("ghost").set({
+      id: "ghost",
+      term: "Ghost ID",
+      question: "Has forbidden id field",
+      answer: "Should fail",
+      chapter: 1,
+      source: "istqb",
+      createdAt: created,
+      updatedAt: created,
+    })
+  );
+  const unauthDb = testEnv.unauthenticatedContext().firestore();
+  await assertFails(
+    unauthDb.collection("users").doc(ALICE_UID).collection("flashcards").get()
+  );
+  const bobDb = testEnv.authenticatedContext(BOB_UID).firestore();
+  await assertFails(
+    bobDb.collection("users").doc(ALICE_UID).collection("flashcards").get()
   );
 });

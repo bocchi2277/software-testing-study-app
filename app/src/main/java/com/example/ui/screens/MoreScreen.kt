@@ -18,11 +18,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ui.ALL_SECTIONS
+import com.example.ui.components.DynamicThemeToggleButton
 import com.example.ui.components.PageHeader
 import com.example.ui.components.SectionCard
 
 @Composable
-fun MoreScreen(onNavigate: (Any) -> Unit) {
+fun MoreScreen(
+    onNavigate: (Any) -> Unit,
+    onToggleTheme: (Boolean) -> Unit
+) {
     BoxWithConstraints {
         val cols = if (maxWidth >= 600.dp) 3 else 2
         val rows = ALL_SECTIONS.chunked(cols)
@@ -32,7 +36,15 @@ fun MoreScreen(onNavigate: (Any) -> Unit) {
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             item {
-                PageHeader(title = "كل الأقسام")
+                PageHeader(
+                    title = "كل الأقسام",
+                    trailing = {
+                        DynamicThemeToggleButton(
+                            onToggle = onToggleTheme,
+                            testTag = "more_theme_toggle"
+                        )
+                    }
+                )
             }
 
             items(rows) { rowSections ->

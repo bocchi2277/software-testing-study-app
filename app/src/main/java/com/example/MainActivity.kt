@@ -1,10 +1,13 @@
 package com.example
 
 import android.app.Application
+import android.graphics.Color as AndroidColor
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
@@ -25,10 +28,10 @@ import com.example.model.UiState
 import com.example.ui.QaAppShell
 import com.example.ui.QaViewModel
 import com.example.ui.QaViewModelFactory
-import com.example.ui.auth.AuthScreen
 import com.example.ui.auth.attemptAutoSignIn
 import com.example.ui.auth.authStateFlow
 import com.example.ui.theme.QaPathTheme
+import com.example.ui.theme.resolveIsDarkTheme
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 
@@ -42,7 +45,21 @@ class MainActivity : ComponentActivity() {
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 AppNavigation(
                     application = application,
-                    widthSizeClass = windowSizeClass.widthSizeClass
+                    widthSizeClass = windowSizeClass.widthSizeClass,
+                    onDarkThemeChange = { dark ->
+                        enableEdgeToEdge(
+                            statusBarStyle = if (dark) {
+                                SystemBarStyle.dark(AndroidColor.TRANSPARENT)
+                            } else {
+                                SystemBarStyle.light(AndroidColor.TRANSPARENT, AndroidColor.TRANSPARENT)
+                            },
+                            navigationBarStyle = if (dark) {
+                                SystemBarStyle.dark(AndroidColor.TRANSPARENT)
+                            } else {
+                                SystemBarStyle.light(AndroidColor.TRANSPARENT, AndroidColor.TRANSPARENT)
+                            }
+                        )
+                    }
                 )
             }
         }
@@ -52,7 +69,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun AppNavigation(
     application: Application,
-    widthSizeClass: WindowWidthSizeClass
+    widthSizeClass: WindowWidthSizeClass,
+    onDarkThemeChange: (Boolean) -> Unit
 ) {
     val auth = Firebase.auth
     val currentUser by auth.authStateFlow().collectAsStateWithLifecycle(initialValue = auth.currentUser)
@@ -73,24 +91,28 @@ private fun AppNavigation(
     }
 
     val user = currentUser
-    if (user == null) {
-        QaPathTheme(themeMode = "auto") {
-            AuthScreen(onAuthSuccess = {})
+    val sessionKey = user?.uid ?: "guest"
+    key(sessionKey) {
+        val viewModel: QaViewModel = viewModel(
+            key = sessionKey,
+            factory = QaViewModelFactory(application, user?.uid)
+        )
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        val cachedThemeMode by viewModel.cachedThemeMode.collectAsStateWithLifecycle()
+        val themeMode = (uiState as? UiState.Success)?.data?.profile?.theme ?: cachedThemeMode
+        val systemDark = isSystemInDarkTheme()
+        val isDark = resolveIsDarkTheme(themeMode, systemDark)
+
+        LaunchedEffect(isDark) {
+            onDarkThemeChange(isDark)
         }
-    } else {
-        key(user.uid) {
-            val viewModel: QaViewModel = viewModel(
-                key = user.uid,
-                factory = QaViewModelFactory(application, user.uid)
+
+        QaPathTheme(themeMode = themeMode) {
+            QaAppShell(
+                viewModel = viewModel,
+                widthSizeClass = widthSizeClass
             )
-            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-            val themeMode = (uiState as? UiState.Success)?.data?.profile?.theme ?: "auto"
-            QaPathTheme(themeMode = themeMode) {
-                QaAppShell(
-                    viewModel = viewModel,
-                    widthSizeClass = widthSizeClass
-                )
-            }
         }
     }
 }
+

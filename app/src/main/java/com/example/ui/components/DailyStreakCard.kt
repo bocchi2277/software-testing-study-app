@@ -47,6 +47,7 @@ import com.example.util.StatsUtils
 fun DailyStreakCard(
     state: AppState,
     checkingIn: Boolean,
+    isGuest: Boolean = false,
     onCheckInToday: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -135,6 +136,7 @@ fun DailyStreakCard(
                     }
                     Text(
                         text = when {
+                            studiedToday && isGuest -> "أحسنت! تم تسجيل دراسة اليوم (سجّل الدخول للحفظ السحابي)"
                             studiedToday -> "أحسنت! تم توثيق دراسة اليوم في حسابك"
                             currentStreak > 0 -> "ادرس اليوم للحفاظ على سلسلتك المتواصلة"
                             else -> "ابدأ سلسلتك اليوم بالتعلّم أو جلسة تركيز"

@@ -1,16 +1,19 @@
 package com.example.db
 
+import com.example.data.CardsData
 import com.example.data.SyllabusData
 import com.example.model.AppState
 import com.example.model.CardState
 import com.example.model.ChapterBreakdown
 import com.example.model.ExamResult
+import com.example.model.IstqbFlashcard
 import com.example.model.NoteItem
 import com.example.model.Profile
 import com.example.model.QuizAttempt
 import com.example.model.StudySession
 import com.example.model.TaskItem
 import com.example.util.DateUtils
+import com.example.util.StatsUtils
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -40,7 +43,7 @@ class QaRepository(
     }
 
     companion object {
-        val BOX_DAYS = listOf(0, 1, 2, 4, 8, 16)
+        val BOX_DAYS = com.example.util.LeitnerScheduler.BOX_DAYS
     }
 
     private fun requireUserId(): String =
@@ -196,6 +199,31 @@ class QaRepository(
             }
             .logFirestoreErrors(userId, OperationType.LIST, "users/$userId/tasks")
 
+        val flashcardsFlow: Flow<List<IstqbFlashcard>> = base.collection("flashcards")
+            .orderBy("chapter", Query.Direction.ASCENDING)
+            .snapshots()
+            .map { qs ->
+                qs.documents.mapNotNull { doc ->
+                    val data = doc.data ?: return@mapNotNull null
+                    val term = data["term"] as? String ?: return@mapNotNull null
+                    val question = data["question"] as? String ?: return@mapNotNull null
+                    val answer = data["answer"] as? String ?: return@mapNotNull null
+                    val chapter = (data["chapter"] as? Number)?.toInt()?.coerceIn(1, 6) ?: 1
+                    val hint = data["hint"] as? String
+                    val source = (data["source"] as? String)?.takeIf { it in listOf("istqb", "custom") } ?: "istqb"
+                    IstqbFlashcard(
+                        id = doc.id,
+                        term = term,
+                        question = question,
+                        answer = answer,
+                        chapter = chapter,
+                        hint = hint,
+                        source = source
+                    )
+                }
+            }
+            .logFirestoreErrors(userId, OperationType.LIST, "users/$userId/flashcards")
+
         emitAll(
             combine(
                 listOf(
@@ -206,7 +234,8 @@ class QaRepository(
                     attemptsFlow,
                     examsFlow,
                     notesFlow,
-                    tasksFlow
+                    tasksFlow,
+                    flashcardsFlow
                 )
             ) { arr ->
                 @Suppress("UNCHECKED_CAST")
@@ -215,6 +244,7 @@ class QaRepository(
                     progress = arr[1] as Map<String, String>,
                     sessions = arr[2] as List<StudySession>,
                     cards = arr[3] as Map<String, CardState>,
+                    flashcards = arr[8] as List<IstqbFlashcard>,
                     attempts = arr[4] as List<QuizAttempt>,
                     exams = arr[5] as List<ExamResult>,
                     notes = arr[6] as List<NoteItem>,
@@ -229,6 +259,8 @@ class QaRepository(
         val streakVal = (data["currentStreak"] as? Number)?.toInt()?.coerceIn(0, 36500) ?: 0
         val bestVal = (data["bestStreak"] as? Number)?.toInt()?.coerceIn(0, 36500) ?: 0
         val lastStudy = (data["lastStudyDate"] as? String)?.takeIf { DateUtils.isValidDay(it) }
+        val totalFocusMin = (data["totalFocusMinutes"] as? Number)?.toInt()?.coerceIn(0, 1_000_000) ?: 0
+        val focusPts = (data["focusPoints"] as? Number)?.toInt()?.coerceIn(0, 10_000_000) ?: 0
         return Profile(
             examDate = (data["examDate"] as? String)?.takeIf { DateUtils.isValidDay(it) },
             startDate = (data["startDate"] as? String)?.takeIf { DateUtils.isValidDay(it) } ?: DateUtils.todayStr(),
@@ -239,7 +271,9 @@ class QaRepository(
             breakMin = (data["breakMin"] as? Number)?.toInt()?.coerceIn(1, 60) ?: 5,
             currentStreak = streakVal,
             bestStreak = maxOf(bestVal, streakVal),
-            lastStudyDate = lastStudy
+            lastStudyDate = lastStudy,
+            totalFocusMinutes = totalFocusMin,
+            focusPoints = focusPts
         )
     }
 
@@ -261,6 +295,8 @@ class QaRepository(
                     "breakMin" to 5,
                     "currentStreak" to 0,
                     "bestStreak" to 0,
+                    "totalFocusMinutes" to 0,
+                    "focusPoints" to 0,
                     "createdAt" to FieldValue.serverTimestamp(),
                     "updatedAt" to FieldValue.serverTimestamp()
                 )
@@ -306,6 +342,8 @@ class QaRepository(
                     put("currentStreak", updated.currentStreak.coerceIn(0, 36500))
                     put("bestStreak", updated.bestStreak.coerceIn(0, 36500))
                     updated.lastStudyDate?.takeIf { DateUtils.isValidDay(it) }?.let { put("lastStudyDate", it) }
+                    put("totalFocusMinutes", updated.totalFocusMinutes.coerceIn(0, 1_000_000))
+                    put("focusPoints", updated.focusPoints.coerceIn(0, 10_000_000))
                     put("createdAt", FieldValue.serverTimestamp())
                     put("updatedAt", FieldValue.serverTimestamp())
                 }
@@ -474,6 +512,8 @@ class QaRepository(
                         "currentStreak" to 1,
                         "bestStreak" to 1,
                         "lastStudyDate" to safeDay,
+                        "totalFocusMinutes" to 0,
+                        "focusPoints" to 0,
                         "createdAt" to FieldValue.serverTimestamp(),
                         "updatedAt" to FieldValue.serverTimestamp()
                     )
@@ -520,8 +560,8 @@ class QaRepository(
         topic: String? = null,
         day: String = DateUtils.todayStr()
     ): Result<Unit> {
-        val docRef = userDoc(userId).collection("sessions").document()
-        val path = docRef.path
+        val sessionRef = userDoc(userId).collection("sessions").document()
+        val path = sessionRef.path
         return try {
             val uid = requireUserId()
             check(uid == userId) { "Signed-in user changed; refusing cross-user write." }
@@ -529,15 +569,79 @@ class QaRepository(
             val safeDay = day.takeIf { DateUtils.isValidDay(it) } ?: DateUtils.todayStr()
             val safeKind = kind.trim().ifEmpty { "focus" }.take(30)
             val safeTopic = topic?.trim()?.takeIf { it.isNotEmpty() }?.take(30)
-            val payload = buildMap<String, Any> {
+            val earnedPoints = StatsUtils.pointsForSession(safeMinutes, safeKind)
+            val sessionPayload = buildMap<String, Any> {
                 put("day", safeDay)
                 put("minutes", safeMinutes)
                 put("kind", safeKind)
                 if (safeTopic != null) put("topic", safeTopic)
                 put("createdAt", FieldValue.serverTimestamp())
             }
-            docRef.set(payload).await()
-            recordDailyStudyBestEffort(uid, safeDay)
+            val uRef = userDoc(uid)
+            db.runTransaction { tx ->
+                val userSnap = tx.get(uRef)
+                tx.set(sessionRef, sessionPayload)
+                if (!userSnap.exists()) {
+                    tx.set(
+                        uRef,
+                        mapOf(
+                            "userId" to uid,
+                            "startDate" to safeDay,
+                            "dailyHours" to 2.0,
+                            "startTime" to "18:00",
+                            "theme" to "auto",
+                            "focusMin" to 25,
+                            "breakMin" to 5,
+                            "currentStreak" to 1,
+                            "bestStreak" to 1,
+                            "lastStudyDate" to safeDay,
+                            "totalFocusMinutes" to safeMinutes.coerceAtMost(1_000_000),
+                            "focusPoints" to earnedPoints.coerceAtMost(10_000_000),
+                            "createdAt" to FieldValue.serverTimestamp(),
+                            "updatedAt" to FieldValue.serverTimestamp()
+                        )
+                    )
+                } else {
+                    val prevTotalFocus = (userSnap.getLong("totalFocusMinutes") ?: 0L).toInt().coerceIn(0, 1_000_000)
+                    val prevFocusPoints = (userSnap.getLong("focusPoints") ?: 0L).toInt().coerceIn(0, 10_000_000)
+                    val prevStreak = (userSnap.getLong("currentStreak") ?: 0L).toInt().coerceIn(0, 36500)
+                    val prevBest = (userSnap.getLong("bestStreak") ?: 0L).toInt().coerceIn(0, 36500)
+                    val prevLast = userSnap.getString("lastStudyDate")?.takeIf { DateUtils.isValidDay(it) }
+
+                    val nextTotalFocus = (prevTotalFocus + safeMinutes).coerceIn(0, 1_000_000)
+                    val nextFocusPoints = (prevFocusPoints + earnedPoints).coerceIn(0, 10_000_000)
+
+                    val updateMap = mutableMapOf<String, Any>(
+                        "totalFocusMinutes" to nextTotalFocus,
+                        "focusPoints" to nextFocusPoints,
+                        "updatedAt" to FieldValue.serverTimestamp()
+                    )
+
+                    if (prevLast == null) {
+                        updateMap["currentStreak"] = 1
+                        updateMap["bestStreak"] = maxOf(prevBest, 1).coerceAtMost(36500)
+                        updateMap["lastStudyDate"] = safeDay
+                    } else {
+                        val diff = DateUtils.daysBetween(prevLast, safeDay)
+                        if (diff == 0 && prevStreak < 1) {
+                            updateMap["currentStreak"] = 1
+                            updateMap["bestStreak"] = maxOf(prevBest, 1).coerceAtMost(36500)
+                        } else if (diff == 1) {
+                            val nextStreak = (prevStreak + 1).coerceAtMost(36500)
+                            updateMap["currentStreak"] = nextStreak
+                            updateMap["bestStreak"] = maxOf(prevBest, nextStreak).coerceAtMost(36500)
+                            updateMap["lastStudyDate"] = safeDay
+                        } else if (diff > 1) {
+                            updateMap["currentStreak"] = 1
+                            updateMap["bestStreak"] = maxOf(prevBest, 1).coerceAtMost(36500)
+                            updateMap["lastStudyDate"] = safeDay
+                        }
+                    }
+
+                    tx.update(uRef, updateMap)
+                }
+                null
+            }.await()
             Result.success(Unit)
         } catch (e: CancellationException) {
             throw e
@@ -573,21 +677,23 @@ class QaRepository(
             val today = DateUtils.todayStr()
             val ref = userDoc(uid).collection("cards").document(docId)
             val snap = ref.get().await()
-            val oldBox = (snap.getLong("box") ?: 1L).toInt().coerceIn(1, 5)
-            val oldReps = (snap.getLong("reps") ?: 0L).toInt().coerceAtLeast(0)
-            val oldLapses = (snap.getLong("lapses") ?: 0L).toInt().coerceAtLeast(0)
-            val newBox = if (known) minOf(5, oldBox + 1) else 1
-            val nextDue = DateUtils.addDays(today, if (known) BOX_DAYS[newBox] else 0)
-            val newReps = (oldReps + 1).coerceAtMost(100000)
-            val newLapses = (oldLapses + if (known) 0 else 1).coerceAtMost(100000)
+            val prev = if (snap.exists()) {
+                CardState(
+                    box = (snap.getLong("box") ?: 1L).toInt(),
+                    due = snap.getString("due") ?: today,
+                    reps = (snap.getLong("reps") ?: 0L).toInt(),
+                    lapses = (snap.getLong("lapses") ?: 0L).toInt()
+                )
+            } else null
+            val next = com.example.util.LeitnerScheduler.nextCardState(prev, known, today)
 
             if (!snap.exists()) {
                 ref.set(
                     mapOf(
-                        "box" to newBox,
-                        "due" to nextDue,
-                        "reps" to newReps,
-                        "lapses" to newLapses,
+                        "box" to next.box,
+                        "due" to next.due,
+                        "reps" to next.reps,
+                        "lapses" to next.lapses,
                         "createdAt" to FieldValue.serverTimestamp(),
                         "updatedAt" to FieldValue.serverTimestamp()
                     )
@@ -595,10 +701,10 @@ class QaRepository(
             } else {
                 ref.update(
                     mapOf(
-                        "box" to newBox,
-                        "due" to nextDue,
-                        "reps" to newReps,
-                        "lapses" to newLapses,
+                        "box" to next.box,
+                        "due" to next.due,
+                        "reps" to next.reps,
+                        "lapses" to next.lapses,
                         "updatedAt" to FieldValue.serverTimestamp()
                     )
                 ).await()
@@ -615,6 +721,118 @@ class QaRepository(
 
     suspend fun resetCards(userId: String): Result<Unit> =
         clearSubcollection(userId, "cards")
+
+    suspend fun ensureFlashcardsSeeded(userId: String): Result<Int> {
+        val path = "users/$userId/flashcards"
+        return try {
+            val uid = requireUserId()
+            check(uid == userId) { "Signed-in user changed; refusing cross-user write." }
+            val col = userDoc(uid).collection("flashcards")
+            val existing = col.limit(1).get().await()
+            if (!existing.isEmpty) {
+                return Result.success(existing.size())
+            }
+            val defaults = CardsData.toDefaultFlashcards()
+            for (chunk in defaults.chunked(450)) {
+                val batch = db.batch()
+                for (card in chunk) {
+                    val docId = sanitizeDocId(card.id)
+                    val payload = buildMap<String, Any> {
+                        put("term", card.term.trim().take(120))
+                        put("question", card.question.trim().take(400))
+                        put("answer", card.answer.trim().take(600))
+                        put("chapter", card.chapter.coerceIn(1, 6))
+                        card.hint?.trim()?.takeIf { it.isNotEmpty() }?.take(200)?.let { put("hint", it) }
+                        put("source", "istqb")
+                        put("createdAt", FieldValue.serverTimestamp())
+                        put("updatedAt", FieldValue.serverTimestamp())
+                    }
+                    batch.set(col.document(docId), payload)
+                }
+                batch.commit().await()
+            }
+            Result.success(defaults.size)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            handleFirestoreError(e, OperationType.WRITE, path)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun refreshFlashcards(userId: String): Result<Int> {
+        val path = "users/$userId/flashcards"
+        return try {
+            val uid = requireUserId()
+            check(uid == userId) { "Signed-in user changed; refusing cross-user read." }
+            ensureFlashcardsSeeded(uid).getOrThrow()
+            val qs = userDoc(uid).collection("flashcards")
+                .orderBy("chapter", Query.Direction.ASCENDING)
+                .get()
+                .await()
+            Result.success(qs.size())
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            handleFirestoreError(e, OperationType.LIST, path)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun saveFlashcard(
+        userId: String,
+        term: String,
+        question: String,
+        answer: String,
+        chapter: Int,
+        hint: String? = null
+    ): Result<Unit> {
+        val cleanTerm = term.trim().take(120)
+        val cleanQuestion = question.trim().ifEmpty { "ما المقصود بمصطلح $cleanTerm؟" }.take(400)
+        val cleanAnswer = answer.trim().take(600)
+        if (cleanTerm.isEmpty() || cleanAnswer.isEmpty()) return Result.success(Unit)
+        val docId = sanitizeDocId("custom-${java.util.UUID.randomUUID().toString().take(12)}")
+        val path = "users/$userId/flashcards/$docId"
+        return try {
+            val uid = requireUserId()
+            check(uid == userId) { "Signed-in user changed; refusing cross-user write." }
+            val safeHint = hint?.trim()?.takeIf { it.isNotEmpty() }?.take(200)
+            val payload = buildMap<String, Any> {
+                put("term", cleanTerm)
+                put("question", cleanQuestion)
+                put("answer", cleanAnswer)
+                put("chapter", chapter.coerceIn(1, 6))
+                if (safeHint != null) put("hint", safeHint)
+                put("source", "custom")
+                put("createdAt", FieldValue.serverTimestamp())
+                put("updatedAt", FieldValue.serverTimestamp())
+            }
+            userDoc(uid).collection("flashcards").document(docId).set(payload).await()
+            Result.success(Unit)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            handleFirestoreError(e, OperationType.CREATE, path)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun deleteFlashcard(userId: String, id: String): Result<Unit> {
+        if (id.isBlank()) return Result.success(Unit)
+        val docId = sanitizeDocId(id)
+        val path = "users/$userId/flashcards/$docId"
+        return try {
+            val uid = requireUserId()
+            check(uid == userId) { "Signed-in user changed; refusing cross-user delete." }
+            userDoc(uid).collection("flashcards").document(docId).delete().await()
+            Result.success(Unit)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            handleFirestoreError(e, OperationType.DELETE, path)
+            Result.failure(e)
+        }
+    }
 
     suspend fun recordAttempt(
         userId: String,
@@ -852,6 +1070,8 @@ class QaRepository(
                         "currentStreak" to 0,
                         "bestStreak" to 0,
                         "lastStudyDate" to FieldValue.delete(),
+                        "totalFocusMinutes" to 0,
+                        "focusPoints" to 0,
                         "updatedAt" to FieldValue.serverTimestamp()
                     )
                 ).await()
@@ -897,6 +1117,14 @@ class QaRepository(
             resetAll(uid).getOrThrow()
 
             val p = imported.profile
+            val importedMinutes = maxOf(
+                p.totalFocusMinutes.coerceAtLeast(0),
+                imported.sessions.sumOf { it.minutes.coerceIn(1, 600) }
+            ).coerceIn(0, 1_000_000)
+            val importedPoints = maxOf(
+                p.focusPoints.coerceAtLeast(0),
+                imported.sessions.sumOf { StatsUtils.pointsForSession(it.minutes.coerceIn(1, 600), it.kind) }
+            ).coerceIn(0, 10_000_000)
             updateProfile(uid, Profile(startDate = DateUtils.todayStr())) {
                 Profile(
                     examDate = p.examDate?.takeIf { DateUtils.isValidDay(it) },
@@ -908,9 +1136,18 @@ class QaRepository(
                     breakMin = p.breakMin.coerceIn(1, 60),
                     currentStreak = p.currentStreak.coerceIn(0, 36500),
                     bestStreak = maxOf(p.bestStreak, p.currentStreak).coerceIn(0, 36500),
-                    lastStudyDate = p.lastStudyDate?.takeIf { DateUtils.isValidDay(it) }
+                    lastStudyDate = p.lastStudyDate?.takeIf { DateUtils.isValidDay(it) },
+                    totalFocusMinutes = importedMinutes,
+                    focusPoints = importedPoints
                 )
             }.getOrThrow()
+            userDoc(uid).update(
+                mapOf(
+                    "totalFocusMinutes" to importedMinutes,
+                    "focusPoints" to importedPoints,
+                    "updatedAt" to FieldValue.serverTimestamp()
+                )
+            ).await()
 
             val userRef = userDoc(uid)
             val ops = mutableListOf<Pair<DocumentReference, Map<String, Any>>>()

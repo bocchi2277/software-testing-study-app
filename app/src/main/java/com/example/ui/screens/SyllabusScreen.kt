@@ -39,9 +39,11 @@ import com.example.data.SyllabusData
 import com.example.model.AppState
 import com.example.model.TopicStatus
 import com.example.ui.QaViewModel
+import com.example.ui.components.DynamicThemeToggleButton
 import com.example.ui.components.PageHeader
 import com.example.ui.components.QaProgressBar
 import com.example.ui.components.SectionCard
+import com.example.ui.components.SyllabusRoadmapCard
 import com.example.ui.theme.JetBrainsMono
 import com.example.ui.theme.LocalQaColors
 import com.example.util.StatsUtils
@@ -76,17 +78,27 @@ fun SyllabusScreen(
         item {
             PageHeader(
                 title = "منهج ISTQB CTFL v4.0",
-                sub = "${SyllabusData.CHAPTERS.size} فصول، ${SyllabusData.EXAM_TOTAL_Q} سؤالاً في الامتحان. تقدمك $totalPct%"
+                sub = "${SyllabusData.CHAPTERS.size} فصول، ${SyllabusData.EXAM_TOTAL_Q} سؤالاً في الامتحان. تقدمك $totalPct%",
+                trailing = {
+                    DynamicThemeToggleButton(
+                        onToggle = { isDark -> viewModel.toggleLightDarkTheme(isDark) },
+                        compact = true,
+                        testTag = "syllabus_theme_toggle"
+                    )
+                }
             )
-            SectionCard {
-                QaProgressBar(pct = totalPct)
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "ادخل كل موضوع لقراءة الملخص والأهداف التعليمية (Learning objectives) والمصادر المرتبطة. اضغط على الحالة لتغييرها بسرعة: لم أبدأ ← أتعلم ← أتقنته ← يحتاج مراجعة.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = qa.muted
-                )
-            }
+            SyllabusRoadmapCard(
+                state = state,
+                onOpenTopic = onOpenTopic,
+                onToggleModuleComplete = { chapterId, completed ->
+                    viewModel.setChapterCompleted(chapterId, completed)
+                },
+                onToggleTopicComplete = { topicId, completed ->
+                    viewModel.setProgress("t:$topicId", if (completed) "done" else null)
+                },
+                mutatingChapterIds = mutatingChapterIds,
+                initiallyExpandedChapterId = StatsUtils.nextTopic(state)?.chapter ?: 1
+            )
         }
 
         items(SyllabusData.CHAPTERS, key = { it.id }) { chapter ->

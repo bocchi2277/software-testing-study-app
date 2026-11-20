@@ -37,7 +37,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.data.CardsData
 import com.example.data.SyllabusData
 import com.example.model.AppState
 import com.example.ui.components.LtrContent
@@ -46,6 +45,7 @@ import com.example.ui.components.QaProgressBar
 import com.example.ui.components.ReadinessRing
 import com.example.ui.components.SectionCard
 import com.example.ui.components.StatCard
+import com.example.ui.components.WeeklyActivityChartCard
 import com.example.ui.theme.LocalQaColors
 import com.example.util.DateUtils
 import com.example.util.StatsUtils
@@ -54,20 +54,16 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-private data class AchievementBadge(
-    val name: String,
-    val desc: String,
-    val unlocked: Boolean,
-    val icon: String
-)
-
 @Composable
 fun ProgressScreen(state: AppState) {
     val qa = LocalQaColors.current
     val minutesMap = remember(state.sessions) { StatsUtils.minutesByDay(state) }
     val acc = remember(state.attempts) { StatsUtils.chapterAccuracy(state) }
     val today = DateUtils.todayStr()
-    val totalMin = state.sessions.sumOf { it.minutes }
+    val totalMin = remember(state) { StatsUtils.totalFocusMinutes(state) }
+    val focusPoints = remember(state) { StatsUtils.focusPoints(state) }
+    val focusLevel = remember(focusPoints) { StatsUtils.focusLevel(focusPoints) }
+    val focusSessionCount = remember(state) { StatsUtils.focusSessionCount(state) }
     val streakDays = StatsUtils.streak(state)
     val bestStreakDays = StatsUtils.bestStreak(state)
     val answered = StatsUtils.totalAnswered(state)
@@ -86,20 +82,7 @@ fun ProgressScreen(state: AppState) {
     val maxDay = max(30, minutesMap.values.maxOrNull() ?: 0)
     var selectedHeatDay by remember { mutableStateOf<String?>(null) }
 
-    val badges = remember(state) {
-        listOf(
-            AchievementBadge("البداية", "سجّل أول جلسة دراسة", state.sessions.isNotEmpty(), "🌱"),
-            AchievementBadge("أسبوع متواصل", "7 أيام متتالية", streakDays >= 7, "🔥"),
-            AchievementBadge("10 ساعات", "أكمل 10 ساعات دراسة", totalMin >= 600, "⏳"),
-            AchievementBadge("50 ساعة", "أكمل 50 ساعة دراسة", totalMin >= 3000, "🏔️"),
-            AchievementBadge("قارئ المنهج", "أتقن 10 مواضيع", topicsDone >= 10, "📚"),
-            AchievementBadge("ختمة المنهج", "أتقن كل المواضيع", topicsDone == SyllabusData.ALL_TOPICS.size, "🏆"),
-            AchievementBadge("100 سؤال", "أجب عن 100 سؤال", answered >= 100, "💯"),
-            AchievementBadge("حافظ المصطلحات", "أتقن 30 بطاقة", mastered >= 30, "🃏"),
-            AchievementBadge("ناجح في المحاكاة", "65% أو أكثر في محاكاة", bestExam >= 65, "✅"),
-            AchievementBadge("جاهز للامتحان", "90% أو أكثر في محاكاة", bestExam >= 90, "🎓")
-        )
-    }
+    val badges = remember(state) { StatsUtils.allBadges(state) }
     val unlockedCount = badges.count { it.unlocked }
 
     LazyColumn(
@@ -119,12 +102,12 @@ fun ProgressScreen(state: AppState) {
                 val wide = maxWidth >= 540.dp
                 if (wide) {
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        StatCard(DateUtils.fmtMinutes(totalMin), "إجمالي وقت الدراسة", modifier = Modifier.weight(1f))
+                        StatCard(DateUtils.fmtMinutes(totalMin), "إجمالي وقت التركيز", modifier = Modifier.weight(1f))
+                        StatCard("$focusPoints XP", "نقاط التقدم", modifier = Modifier.weight(1f))
                         StatCard("🔥 $streakDays", "أيام متتالية (الأفضل: $bestStreakDays)", modifier = Modifier.weight(1f))
-                        StatCard("$answered", "سؤالاً أجبت", modifier = Modifier.weight(1f))
                         StatCard(
                             "$overallAcc%",
-                            "دقتك العامة",
+                            "دقتك العامة ($answered سؤال)",
                             toneColor = if (overallAcc >= 65) qa.ok else qa.bad,
                             modifier = Modifier.weight(1f)
                         )
@@ -132,20 +115,51 @@ fun ProgressScreen(state: AppState) {
                 } else {
                     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                            StatCard(DateUtils.fmtMinutes(totalMin), "إجمالي وقت الدراسة", modifier = Modifier.weight(1f))
-                            StatCard("🔥 $streakDays", "أيام متتالية (الأفضل: $bestStreakDays)", modifier = Modifier.weight(1f))
+                            StatCard(DateUtils.fmtMinutes(totalMin), "إجمالي وقت التركيز", modifier = Modifier.weight(1f))
+                            StatCard("$focusPoints XP", "نقاط التقدم", modifier = Modifier.weight(1f))
                         }
                         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                            StatCard("$answered", "سؤالاً أجبت", modifier = Modifier.weight(1f))
+                            StatCard("🔥 $streakDays", "أيام متتالية (الأفضل: $bestStreakDays)", modifier = Modifier.weight(1f))
                             StatCard(
                                 "$overallAcc%",
-                                "دقتك العامة",
+                                "دقتك العامة ($answered سؤال)",
                                 toneColor = if (overallAcc >= 65) qa.ok else qa.bad,
                                 modifier = Modifier.weight(1f)
                             )
                         }
                     }
                 }
+            }
+        }
+
+        // Focus XP Level Progress
+        item {
+            SectionCard {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "${focusLevel.emoji} المستوى ${focusLevel.level}: ${focusLevel.title}",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "${focusLevel.currentPoints} / ${focusLevel.nextLevelPoints} XP",
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+                Spacer(modifier = Modifier.height(6.dp))
+                QaProgressBar(pct = focusLevel.progressPct)
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = "أكملت $focusSessionCount جلسة بومودورو · كل دقيقة تركيز تمنحك +2 نقطة ومكافأة +15 نقطة لكل جلسة بومودورو.",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = qa.muted
+                )
             }
         }
 
@@ -159,7 +173,7 @@ fun ProgressScreen(state: AppState) {
                     ReadinessRing(pct = readinessPct, size = 122.dp, sub = "الجاهزية")
                     Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text("المنهج: $syllabusPct% ($topicsDone/${SyllabusData.ALL_TOPICS.size} موضوعاً)", fontWeight = FontWeight.Medium)
-                        Text("البطاقات المتقنة: $mastered/${CardsData.CARDS.size}", fontWeight = FontWeight.Medium)
+                        Text("البطاقات المتقنة: $mastered/${StatsUtils.effectiveFlashcards(state).size}", fontWeight = FontWeight.Medium)
                         Text("أفضل نتيجة محاكاة: $bestExam%", fontWeight = FontWeight.Medium)
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
@@ -170,6 +184,11 @@ fun ProgressScreen(state: AppState) {
                     }
                 }
             }
+        }
+
+        // Weekly Activity Chart (Pomodoro study visualization)
+        item {
+            WeeklyActivityChartCard(state = state)
         }
 
         // 12-Week Heatmap

@@ -71,6 +71,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.model.AppState
 import com.example.model.UiState
+import com.example.ui.components.DynamicThemeToggleButton
 import com.example.ui.components.FloatingTimerPill
 import com.example.ui.components.SectionCard
 import com.example.ui.screens.CardsScreen
@@ -230,7 +231,14 @@ fun QaAppShell(
                     modifier = Modifier
                         .fillMaxHeight()
                         .verticalScroll(rememberScrollState()),
-                    containerColor = MaterialTheme.colorScheme.surface
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    header = {
+                        DynamicThemeToggleButton(
+                            onToggle = { isDark -> viewModel.toggleLightDarkTheme(isDark) },
+                            compact = true,
+                            testTag = "rail_theme_toggle"
+                        )
+                    }
                 ) {
                     ALL_SECTIONS.forEach { sec ->
                         val selected = when (sec.route) {
@@ -331,7 +339,8 @@ fun QaAppShell(
                                     viewModel = viewModel,
                                     onOpenTopic = { id -> navController.navigate(TopicDetailRoute(id)) },
                                     onOpenCards = { navController.navigateTopLevel(CardsRoute) },
-                                    onOpenPractice = { ch, mode -> navController.navigate(PracticeRoute(ch, mode)) }
+                                    onOpenPractice = { ch, mode -> navController.navigate(PracticeRoute(ch, mode)) },
+                                    onOpenProgress = { navController.navigateTopLevel(ProgressRoute) }
                                 )
                             }
                             composable<SyllabusRoute> {
@@ -417,7 +426,8 @@ fun QaAppShell(
                             }
                             composable<MoreRoute> {
                                 MoreScreen(
-                                    onNavigate = { route -> navController.navigate(route) }
+                                    onNavigate = { route -> navController.navigate(route) },
+                                    onToggleTheme = { isDark -> viewModel.toggleLightDarkTheme(isDark) }
                                 )
                             }
                         }

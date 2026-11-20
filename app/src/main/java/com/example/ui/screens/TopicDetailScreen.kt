@@ -43,6 +43,7 @@ import com.example.data.SyllabusData
 import com.example.model.AppState
 import com.example.model.TopicStatus
 import com.example.ui.QaViewModel
+import com.example.ui.components.DynamicThemeToggleButton
 import com.example.ui.components.PageHeader
 import com.example.ui.components.QaFilterChip
 import com.example.ui.components.SectionCard
@@ -107,14 +108,23 @@ fun TopicDetailScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         item {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 IconButton(onClick = onBack, modifier = Modifier.testTag("topic_back_button")) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "العودة للمنهج")
                 }
                 Text(
                     text = "المنهج / الفصل ${chapter?.id ?: topic.chapter}: ${chapter?.ar ?: ""}",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = qa.muted
+                    color = qa.muted,
+                    modifier = Modifier.weight(1f)
+                )
+                DynamicThemeToggleButton(
+                    onToggle = { isDark -> viewModel.toggleLightDarkTheme(isDark) },
+                    compact = true,
+                    testTag = "topic_theme_toggle"
                 )
             }
             Spacer(modifier = Modifier.height(4.dp))

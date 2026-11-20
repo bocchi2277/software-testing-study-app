@@ -50,6 +50,14 @@
           "type": "string",
           "description": "Most recent study activity date in YYYY-MM-DD format."
         },
+        "totalFocusMinutes": {
+          "type": "integer",
+          "description": "Accumulated active Pomodoro and study focus minutes logged by the user."
+        },
+        "focusPoints": {
+          "type": "integer",
+          "description": "Accumulated progress XP points rewarded for completed focus and study sessions."
+        },
         "createdAt": {
           "type": "string",
           "format": "date-time",
@@ -277,6 +285,49 @@
         }
       },
       "required": ["title", "day", "done", "createdAt", "updatedAt"]
+    },
+    "IstqbFlashcard": {
+      "title": "IstqbFlashcard",
+      "description": "ISTQB testing terminology flashcard with study question, answer, and hint stored in Firestore.",
+      "type": "object",
+      "properties": {
+        "term": {
+          "type": "string",
+          "description": "ISTQB testing term (1 to 120 chars)."
+        },
+        "question": {
+          "type": "string",
+          "description": "ISTQB-related recall question (1 to 400 chars)."
+        },
+        "answer": {
+          "type": "string",
+          "description": "Concise Arabic/ISTQB definition and answer (1 to 600 chars)."
+        },
+        "chapter": {
+          "type": "integer",
+          "description": "ISTQB syllabus chapter number (1 to 6)."
+        },
+        "hint": {
+          "type": "string",
+          "description": "Optional study hint or exam tip (max 200 chars)."
+        },
+        "source": {
+          "type": "string",
+          "enum": ["istqb", "custom"],
+          "description": "Origin of the flashcard."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp written via FieldValue.serverTimestamp()."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server update timestamp written via FieldValue.serverTimestamp()."
+        }
+      },
+      "required": ["term", "question", "answer", "chapter", "source", "createdAt", "updatedAt"]
     }
   },
   "firestore": {
@@ -311,6 +362,10 @@
     "/users/{userId}/tasks/{taskId}": {
       "schema": { "$ref": "#/entities/TaskItem" },
       "description": "Per-user daily study tasks."
+    },
+    "/users/{userId}/flashcards/{flashcardId}": {
+      "schema": { "$ref": "#/entities/IstqbFlashcard" },
+      "description": "Per-user ISTQB terminology spaced-repetition flashcard questions fetched from Firestore."
     }
   }
 }

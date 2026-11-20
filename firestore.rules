@@ -44,7 +44,9 @@ service cloud.firestore {
              data.breakMin is int && data.breakMin >= 1 && data.breakMin <= 60 &&
              (!('currentStreak' in data) || (data.currentStreak is int && data.currentStreak >= 0 && data.currentStreak <= 36500)) &&
              (!('bestStreak' in data) || (data.bestStreak is int && data.bestStreak >= 0 && data.bestStreak <= 36500)) &&
-             (!('lastStudyDate' in data) || data.lastStudyDate == null || (data.lastStudyDate is string && data.lastStudyDate.size() >= 8 && data.lastStudyDate.size() <= 20));
+             (!('lastStudyDate' in data) || data.lastStudyDate == null || (data.lastStudyDate is string && data.lastStudyDate.size() >= 8 && data.lastStudyDate.size() <= 20)) &&
+             (!('totalFocusMinutes' in data) || (data.totalFocusMinutes is int && data.totalFocusMinutes >= 0 && data.totalFocusMinutes <= 1000000)) &&
+             (!('focusPoints' in data) || (data.focusPoints is int && data.focusPoints >= 0 && data.focusPoints <= 10000000));
     }
 
     function isValidProgressEntry(data) {
@@ -94,6 +96,15 @@ service cloud.firestore {
              data.done is bool;
     }
 
+    function isValidIstqbFlashcard(data) {
+      return data.term is string && data.term.size() >= 1 && data.term.size() <= 120 &&
+             data.question is string && data.question.size() >= 1 && data.question.size() <= 400 &&
+             data.answer is string && data.answer.size() >= 1 && data.answer.size() <= 600 &&
+             data.chapter is int && data.chapter >= 1 && data.chapter <= 6 &&
+             (!('hint' in data) || data.hint == null || (data.hint is string && data.hint.size() <= 200)) &&
+             data.source is string && data.source in ['istqb', 'custom'];
+    }
+
     // --- Collection Rules ---
     match /users/{userId} {
       allow get: if isOwner(userId) && isValidId(userId);
@@ -102,7 +113,7 @@ service cloud.firestore {
       allow create: if isOwner(userId) &&
                        isValidId(userId) &&
                        incoming().keys().hasAll(['userId', 'startDate', 'dailyHours', 'startTime', 'theme', 'focusMin', 'breakMin', 'createdAt', 'updatedAt']) &&
-                       incoming().keys().hasOnly(['userId', 'examDate', 'startDate', 'dailyHours', 'startTime', 'theme', 'focusMin', 'breakMin', 'currentStreak', 'bestStreak', 'lastStudyDate', 'createdAt', 'updatedAt']) &&
+                       incoming().keys().hasOnly(['userId', 'examDate', 'startDate', 'dailyHours', 'startTime', 'theme', 'focusMin', 'breakMin', 'currentStreak', 'bestStreak', 'lastStudyDate', 'totalFocusMinutes', 'focusPoints', 'createdAt', 'updatedAt']) &&
                        isValidTimestampField(incoming().createdAt) &&
                        isValidTimestampField(incoming().updatedAt) &&
                        isValidUserProfile(incoming());
@@ -113,7 +124,7 @@ service cloud.firestore {
                        incoming().userId == existing().userId &&
                        incoming().createdAt == existing().createdAt &&
                        isValidTimestampField(incoming().updatedAt) &&
-                       incoming().diff(existing()).affectedKeys().hasOnly(['examDate', 'startDate', 'dailyHours', 'startTime', 'theme', 'focusMin', 'breakMin', 'currentStreak', 'bestStreak', 'lastStudyDate', 'updatedAt']);
+                       incoming().diff(existing()).affectedKeys().hasOnly(['examDate', 'startDate', 'dailyHours', 'startTime', 'theme', 'focusMin', 'breakMin', 'currentStreak', 'bestStreak', 'lastStudyDate', 'totalFocusMinutes', 'focusPoints', 'updatedAt']);
 
       allow delete: if isOwner(userId) && isValidId(userId);
 
@@ -249,6 +260,28 @@ service cloud.firestore {
                          incoming().diff(existing()).affectedKeys().hasOnly(['title', 'day', 'done', 'updatedAt']);
 
         allow delete: if isOwner(userId) && isValidId(taskId);
+      }
+
+      match /flashcards/{flashcardId} {
+        allow get: if isOwner(userId) && isValidId(flashcardId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+                         isValidId(flashcardId) &&
+                         incoming().keys().hasAll(['term', 'question', 'answer', 'chapter', 'source', 'createdAt', 'updatedAt']) &&
+                         incoming().keys().hasOnly(['term', 'question', 'answer', 'chapter', 'hint', 'source', 'createdAt', 'updatedAt']) &&
+                         isValidTimestampField(incoming().createdAt) &&
+                         isValidTimestampField(incoming().updatedAt) &&
+                         isValidIstqbFlashcard(incoming());
+
+        allow update: if isOwner(userId) &&
+                         isValidId(flashcardId) &&
+                         isValidIstqbFlashcard(incoming()) &&
+                         incoming().createdAt == existing().createdAt &&
+                         isValidTimestampField(incoming().updatedAt) &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['term', 'question', 'answer', 'chapter', 'hint', 'source', 'updatedAt']);
+
+        allow delete: if isOwner(userId) && isValidId(flashcardId);
       }
     }
   }

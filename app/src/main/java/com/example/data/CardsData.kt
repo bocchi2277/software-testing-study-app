@@ -1,5 +1,7 @@
 package com.example.data
 
+import com.example.model.IstqbFlashcard
+
 data class CardDef(
     val id: String,
     val term: String,
@@ -27,7 +29,7 @@ object CardsData {
         Triple("Testware", "كل مخرجات أنشطة الاختبار: خطط، حالات، بيانات، سكربتات، تقارير.", 1),
         Triple("Traceability", "ربط test basis بالاختبارات والنتائج لدعم الـ coverage وتحليل الأثر.", 1),
         Triple("Shift-left", "نقل أنشطة الاختبار لمراحل مبكرة من دورة التطوير.", 1),
-        Triple("Pesticide paradox", "تكرار نفس الاختبارات يقلل اكتشاف defects جديدة.", 1),
+        Triple("Tests wear out (Pesticide paradox)", "تكرار نفس الاختبارات يقلل قدرتها على اكتشاف defects جديدة.", 1),
         Triple("Defect clustering", "تتركز معظم الـ defects في عدد قليل من المكونات.", 1),
         Triple("Component (Unit) testing", "اختبار components الفردية منعزلة، غالباً يقوم به المطور.", 2),
         Triple("Integration testing", "اختبار التفاعل بين المكونات أو الأنظمة.", 2),
@@ -66,7 +68,7 @@ object CardsData {
         Triple("Three-point estimation", "E = (a + 4m + b) ÷ 6.", 5),
         Triple("Wideband Delphi", "تقدير جماعي بالخبراء عبر جولات.", 5),
         Triple("Test pyramid", "الكثير من اختبارات الوحدة، أقل للتكامل، أقل للواجهة.", 5),
-        Triple("Risk", "احتمال الحدوث × الأثر.", 5),
+        Triple("Risk", "حدث مستقبلي غير مؤكد يهدد تحقيق هدف، ويُقيَّم مستوى مخاطرته باحتمال الحدوث والأثر (Likelihood × Impact).", 5),
         Triple("Project risk / Product risk", "مخاطر إدارة المشروع مقابل مخاطر جودة المنتج.", 5),
         Triple("Risk-based testing", "توجيه الجهد حسب مستوى المخاطر.", 5),
         Triple("Test progress report", "تقرير دوري يبين التقدم والعوائق والمقاييس.", 5),
@@ -87,4 +89,18 @@ object CardsData {
     val CARDS: List<CardDef> = raw.map { (term, def, ch) ->
         CardDef(id = slug(term), term = term, def = def, ch = ch)
     }
+
+    fun toDefaultFlashcards(): List<IstqbFlashcard> = CARDS.map { card ->
+        val chapterName = SyllabusData.findChapter(card.ch)?.ar ?: "الفصل ${card.ch}"
+        IstqbFlashcard(
+            id = card.id,
+            term = card.term,
+            question = "ما المقصود بمصطلح ${card.term} وفق منهج ISTQB؟",
+            answer = card.def,
+            chapter = card.ch,
+            hint = "الفصل ${card.ch}: $chapterName",
+            source = "istqb"
+        )
+    }
 }
+

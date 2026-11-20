@@ -13,7 +13,9 @@ data class Profile(
     val breakMin: Int = 5,
     val currentStreak: Int = 0,
     val bestStreak: Int = 0,
-    val lastStudyDate: String? = null
+    val lastStudyDate: String? = null,
+    val totalFocusMinutes: Int = 0,
+    val focusPoints: Int = 0
 )
 
 @Serializable
@@ -75,11 +77,23 @@ data class TaskItem(
 )
 
 @Serializable
+data class IstqbFlashcard(
+    val id: String = "",
+    val term: String,
+    val question: String,
+    val answer: String,
+    val chapter: Int = 1,
+    val hint: String? = null,
+    val source: String = "istqb"
+)
+
+@Serializable
 data class AppState(
     val profile: Profile = Profile(),
     val progress: Map<String, String> = emptyMap(),
     val sessions: List<StudySession> = emptyList(),
     val cards: Map<String, CardState> = emptyMap(),
+    val flashcards: List<IstqbFlashcard> = emptyList(),
     val attempts: List<QuizAttempt> = emptyList(),
     val exams: List<ExamResult> = emptyList(),
     val notes: List<NoteItem> = emptyList(),

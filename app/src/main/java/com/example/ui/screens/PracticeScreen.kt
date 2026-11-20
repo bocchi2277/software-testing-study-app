@@ -52,8 +52,8 @@ import kotlin.math.roundToInt
 
 private sealed interface PracticeView {
     data object Menu : PracticeView
-    data class PracticeSession(val qs: List<PreparedQuestion>, val title: String) : PracticeView
-    data class ExamSession(val qs: List<PreparedQuestion>, val minutes: Int) : PracticeView
+    data class PracticeSession(val qs: List<PreparedQuestion>, val title: String, val initialEnglish: Boolean) : PracticeView
+    data class ExamSession(val qs: List<PreparedQuestion>, val minutes: Int, val initialEnglish: Boolean) : PracticeView
 }
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -71,6 +71,7 @@ fun PracticeScreen(
     var qFilter by remember { mutableStateOf("all") }
     var qCount by remember { mutableIntStateOf(10) }
     var examMinutes by remember { mutableIntStateOf(60) }
+    var useEnglish by remember { mutableStateOf(false) }
     var autoLaunched by remember { mutableStateOf(false) }
 
     var chMenuExpanded by remember { mutableStateOf(false) }
@@ -104,7 +105,7 @@ fun PracticeScreen(
                 "الفصل $chapter: ${c?.ar ?: ""}"
             }
         }
-        view = PracticeView.PracticeSession(qs, title)
+        view = PracticeView.PracticeSession(qs, title, useEnglish)
         return true
     }
 
@@ -117,7 +118,7 @@ fun PracticeScreen(
             val rest = QuestionsData.QUESTIONS.filter { it !in picked }.shuffled()
             picked += rest.take(40 - picked.size)
         }
-        view = PracticeView.ExamSession(picked.shuffled().map { QuestionsData.prepare(it) }, examMinutes)
+        view = PracticeView.ExamSession(picked.shuffled().map { QuestionsData.prepare(it) }, examMinutes, useEnglish)
     }
 
     LaunchedEffect(initialCh, initialMode) {
@@ -145,6 +146,7 @@ fun PracticeScreen(
             PracticeSessionView(
                 qs = current.qs,
                 title = current.title,
+                initialEnglish = current.initialEnglish,
                 viewModel = viewModel,
                 onExit = {
                     view = PracticeView.Menu
@@ -157,6 +159,7 @@ fun PracticeScreen(
             ExamSessionView(
                 qs = current.qs,
                 minutes = current.minutes,
+                initialEnglish = current.initialEnglish,
                 viewModel = viewModel,
                 onExit = {
                     view = PracticeView.Menu
@@ -181,7 +184,7 @@ fun PracticeScreen(
         item {
             PageHeader(
                 title = "اختبارات وتدريب",
-                sub = "${QuestionsData.QUESTIONS.size} سؤالاً بتفسير لكل إجابة، والبنك يتوسع باستمرار."
+                sub = "${QuestionsData.QUESTIONS.size} سؤالاً بالعربية والإنجليزية مع تفسير لكل إجابة."
             )
         }
 
@@ -238,6 +241,17 @@ fun PracticeScreen(
                     }
                 }
 
+                Spacer(modifier = Modifier.height(10.dp))
+                Text("لغة العرض (يمكن التبديل أثناء الاختبار)", style = MaterialTheme.typography.labelSmall, color = qa.muted)
+                Spacer(modifier = Modifier.height(4.dp))
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    QaFilterChip("العربية", !useEnglish, { useEnglish = false }, testTag = "practice_lang_ar")
+                    QaFilterChip("English (صيغة الامتحان)", useEnglish, { useEnglish = true }, testTag = "practice_lang_en")
+                }
+
                 Spacer(modifier = Modifier.height(12.dp))
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -272,6 +286,12 @@ fun PracticeScreen(
                 ) {
                     QaFilterChip("60 دقيقة (قياسي)", examMinutes == 60, { examMinutes = 60 })
                     QaFilterChip("75 دقيقة (غير ناطق بالإنجليزية)", examMinutes == 75, { examMinutes = 75 })
+                    QaFilterChip(
+                        text = if (useEnglish) "🌐 English" else "🌐 العربية",
+                        selected = useEnglish,
+                        onClick = { useEnglish = !useEnglish },
+                        testTag = "exam_lang_toggle"
+                    )
                 }
                 Spacer(modifier = Modifier.height(10.dp))
                 Button(

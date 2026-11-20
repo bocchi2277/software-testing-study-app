@@ -57,12 +57,14 @@ import com.example.util.DateUtils
 import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun PracticeSessionView(
     qs: List<PreparedQuestion>,
     title: String,
     viewModel: QaViewModel,
-    onExit: () -> Unit
+    onExit: () -> Unit,
+    initialEnglish: Boolean = false
 ) {
     BackHandler { onExit() }
 
@@ -70,6 +72,7 @@ fun PracticeSessionView(
     var idx by remember { mutableIntStateOf(0) }
     var selectedDisplayIdx by remember { mutableStateOf<Int?>(null) }
     var score by remember { mutableIntStateOf(0) }
+    var useEnglish by remember { mutableStateOf(initialEnglish) }
     val wrongList = remember { mutableStateListOf<PreparedQuestion>() }
 
     val q = qs.getOrNull(idx)
@@ -95,15 +98,43 @@ fun PracticeSessionView(
                     }
                     if (wrongList.isNotEmpty()) {
                         Spacer(modifier = Modifier.height(14.dp))
-                        Text("أسئلة أخطأت فيها:", fontWeight = FontWeight.Bold)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text("أسئلة أخطأت فيها:", fontWeight = FontWeight.Bold)
+                            QaFilterChip(
+                                text = if (useEnglish) "عربي ⇄ EN" else "EN ⇄ عربي",
+                                selected = useEnglish,
+                                onClick = { useEnglish = !useEnglish },
+                                testTag = "summary_language_toggle"
+                            )
+                        }
                         wrongList.forEach { w ->
                             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = qa.border)
-                            Text(w.question.q, fontWeight = FontWeight.Medium)
+                            if (useEnglish) {
+                                LtrContent {
+                                    Text(w.question.qEn, fontWeight = FontWeight.Medium)
+                                }
+                            } else {
+                                Text(w.question.q, fontWeight = FontWeight.Medium)
+                            }
                             Spacer(modifier = Modifier.height(4.dp))
                             LtrContent {
-                                Text("✓ ${w.question.options[0]}", color = qa.ok, fontWeight = FontWeight.Medium)
+                                Text(
+                                    text = "✓ ${if (useEnglish) w.question.optionsEn[0] else w.question.options[0]}",
+                                    color = qa.ok,
+                                    fontWeight = FontWeight.Medium
+                                )
                             }
-                            Text(w.question.exp, style = MaterialTheme.typography.bodyMedium, color = qa.muted)
+                            if (useEnglish) {
+                                LtrContent {
+                                    Text(w.question.expEn, style = MaterialTheme.typography.bodyMedium, color = qa.muted)
+                                }
+                            } else {
+                                Text(w.question.exp, style = MaterialTheme.typography.bodyMedium, color = qa.muted)
+                            }
                         }
                     }
                     Spacer(modifier = Modifier.height(16.dp))
@@ -133,7 +164,31 @@ fun PracticeSessionView(
 
         item {
             SectionCard {
-                Text(q.question.q, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = if (useEnglish) "Chapter ${q.question.ch}" else "الفصل ${q.question.ch}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = qa.muted
+                    )
+                    QaFilterChip(
+                        text = if (useEnglish) "عربي ⇄ EN" else "EN ⇄ عربي",
+                        selected = useEnglish,
+                        onClick = { useEnglish = !useEnglish },
+                        testTag = "session_language_toggle"
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                if (useEnglish) {
+                    LtrContent {
+                        Text(q.question.qEn, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
+                    }
+                } else {
+                    Text(q.question.q, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
+                }
                 Spacer(modifier = Modifier.height(12.dp))
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     q.order.forEachIndexed { displayIdx, origIdx ->
@@ -166,7 +221,7 @@ fun PracticeSessionView(
                         ) {
                             LtrContent {
                                 Text(
-                                    text = q.question.options[origIdx],
+                                    text = if (useEnglish) q.question.optionsEn[origIdx] else q.question.options[origIdx],
                                     style = MaterialTheme.typography.bodyMedium,
                                     modifier = Modifier.padding(14.dp)
                                 )
@@ -184,12 +239,22 @@ fun PracticeSessionView(
                     ) {
                         Column(modifier = Modifier.padding(12.dp)) {
                             Text(
-                                text = if (selectedDisplayIdx == q.correctIdx) "✅ صحيح" else "❌ إجابة خاطئة",
+                                text = if (selectedDisplayIdx == q.correctIdx) {
+                                    if (useEnglish) "✅ Correct" else "✅ صحيح"
+                                } else {
+                                    if (useEnglish) "❌ Incorrect" else "❌ إجابة خاطئة"
+                                },
                                 fontWeight = FontWeight.Bold,
                                 color = if (selectedDisplayIdx == q.correctIdx) qa.ok else qa.bad
                             )
                             Spacer(modifier = Modifier.height(4.dp))
-                            Text(q.question.exp, style = MaterialTheme.typography.bodyMedium)
+                            if (useEnglish) {
+                                LtrContent {
+                                    Text(q.question.expEn, style = MaterialTheme.typography.bodyMedium)
+                                }
+                            } else {
+                                Text(q.question.exp, style = MaterialTheme.typography.bodyMedium)
+                            }
                         }
                     }
                     Spacer(modifier = Modifier.height(12.dp))
@@ -216,7 +281,8 @@ fun ExamSessionView(
     qs: List<PreparedQuestion>,
     minutes: Int,
     viewModel: QaViewModel,
-    onExit: () -> Unit
+    onExit: () -> Unit,
+    initialEnglish: Boolean = false
 ) {
     val qa = LocalQaColors.current
     val answers = remember(qs) { mutableStateListOf<Int?>().apply { repeat(qs.size) { add(null) } } }
@@ -227,6 +293,7 @@ fun ExamSessionView(
     var showConfirmSubmit by remember { mutableStateOf(false) }
     var showConfirmCancel by remember { mutableStateOf(false) }
     var elapsedSec by remember { mutableIntStateOf(0) }
+    var useEnglish by remember { mutableStateOf(initialEnglish) }
     val startAtMs = remember { System.currentTimeMillis() }
 
     fun submitExam() {
@@ -357,29 +424,63 @@ fun ExamSessionView(
             }
 
             item {
-                Text("مراجعة الإجابات", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("مراجعة الإجابات", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    QaFilterChip(
+                        text = if (useEnglish) "عربي ⇄ EN" else "EN ⇄ عربي",
+                        selected = useEnglish,
+                        onClick = { useEnglish = !useEnglish },
+                        testTag = "exam_review_language_toggle"
+                    )
+                }
             }
 
             itemsIndexed(qs) { k, pq ->
                 val ans = answers[k]
                 val ok = ans == pq.correctIdx
+                val icon = if (ok) "✅" else if (ans == null) "⚪" else "❌"
                 SectionCard {
-                    Text(
-                        text = "${k + 1}. ${if (ok) "✅" else if (ans == null) "⚪" else "❌"} ${pq.question.q}",
-                        fontWeight = FontWeight.Medium
-                    )
+                    if (useEnglish) {
+                        LtrContent {
+                            Text(
+                                text = "${k + 1}. $icon ${pq.question.qEn}",
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                    } else {
+                        Text(
+                            text = "${k + 1}. $icon ${pq.question.q}",
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
                     if (!ok && ans != null) {
                         Spacer(modifier = Modifier.height(4.dp))
                         LtrContent {
-                            Text("✗ ${pq.question.options[pq.order[ans]]}", color = qa.bad)
+                            Text(
+                                text = "✗ ${if (useEnglish) pq.question.optionsEn[pq.order[ans]] else pq.question.options[pq.order[ans]]}",
+                                color = qa.bad
+                            )
                         }
                     }
                     Spacer(modifier = Modifier.height(4.dp))
                     LtrContent {
-                        Text("✓ ${pq.question.options[0]}", color = qa.ok)
+                        Text(
+                            text = "✓ ${if (useEnglish) pq.question.optionsEn[0] else pq.question.options[0]}",
+                            color = qa.ok
+                        )
                     }
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text(pq.question.exp, style = MaterialTheme.typography.bodyMedium, color = qa.muted)
+                    if (useEnglish) {
+                        LtrContent {
+                            Text(pq.question.expEn, style = MaterialTheme.typography.bodyMedium, color = qa.muted)
+                        }
+                    } else {
+                        Text(pq.question.exp, style = MaterialTheme.typography.bodyMedium, color = qa.muted)
+                    }
                 }
             }
 
@@ -434,20 +535,42 @@ fun ExamSessionView(
         ) {
             item {
                 SectionCard {
-                    Row(
+                    FlowRow(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Text("الفصل ${q.question.ch}", style = MaterialTheme.typography.labelSmall, color = qa.muted)
-                        QaFilterChip(
-                            text = "🚩 علّمه للمراجعة",
-                            selected = flags[idx] == true,
-                            onClick = { flags[idx] = !(flags[idx] ?: false) }
+                        Text(
+                            text = if (useEnglish) "Chapter ${q.question.ch}" else "الفصل ${q.question.ch}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = qa.muted,
+                            modifier = Modifier.align(Alignment.CenterVertically)
                         )
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            QaFilterChip(
+                                text = if (useEnglish) "عربي ⇄ EN" else "EN ⇄ عربي",
+                                selected = useEnglish,
+                                onClick = { useEnglish = !useEnglish },
+                                testTag = "exam_language_toggle"
+                            )
+                            QaFilterChip(
+                                text = "🚩 علّمه للمراجعة",
+                                selected = flags[idx] == true,
+                                onClick = { flags[idx] = !(flags[idx] ?: false) }
+                            )
+                        }
                     }
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(q.question.q, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
+                    if (useEnglish) {
+                        LtrContent {
+                            Text(q.question.qEn, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
+                        }
+                    } else {
+                        Text(q.question.q, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
+                    }
                     Spacer(modifier = Modifier.height(12.dp))
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         q.order.forEachIndexed { d, orig ->
@@ -465,7 +588,7 @@ fun ExamSessionView(
                             ) {
                                 LtrContent {
                                     Text(
-                                        text = q.question.options[orig],
+                                        text = if (useEnglish) q.question.optionsEn[orig] else q.question.options[orig],
                                         style = MaterialTheme.typography.bodyMedium,
                                         modifier = Modifier.padding(14.dp)
                                     )

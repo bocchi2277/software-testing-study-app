@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -18,14 +17,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -33,9 +28,9 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -46,9 +41,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -57,18 +50,22 @@ import com.example.data.CareerData
 import com.example.data.SyllabusData
 import com.example.model.AppState
 import com.example.ui.QaViewModel
-import com.example.ui.TimerMode
 import com.example.ui.TimerUiState
+import com.example.ui.auth.GoogleSignInButton
 import com.example.ui.components.DailyStreakCard
+import com.example.ui.components.DynamicThemeToggleButton
 import com.example.ui.components.LtrContent
 import com.example.ui.components.PageHeader
+import com.example.ui.components.PomodoroTimerCard
 import com.example.ui.components.QaDatePickerDialog
 import com.example.ui.components.QaProgressBar
+import com.example.ui.components.QuickFlashcardPracticeCard
 import com.example.ui.components.ReadinessRing
 import com.example.ui.components.SectionCard
 import com.example.ui.components.StatCard
 import com.example.ui.components.SyllabusProgressChartCard
-import com.example.ui.theme.JetBrainsMono
+import com.example.ui.components.SyllabusRoadmapCard
+import com.example.ui.components.WeeklyActivityChartCard
 import com.example.ui.theme.LocalQaColors
 import com.example.util.DateUtils
 import com.example.util.StatsUtils
@@ -82,22 +79,23 @@ fun DashboardScreen(
     viewModel: QaViewModel,
     onOpenTopic: (String) -> Unit,
     onOpenCards: () -> Unit,
-    onOpenPractice: (Int?, String?) -> Unit
+    onOpenPractice: (Int?, String?) -> Unit,
+    onOpenProgress: () -> Unit
 ) {
     val qa = LocalQaColors.current
     val mutatingChapterIds by viewModel.mutatingChapterIds.collectAsStateWithLifecycle()
     val checkingInStreak by viewModel.checkingInStreak.collectAsStateWithLifecycle()
+    val syncingFlashcards by viewModel.syncingFlashcards.collectAsStateWithLifecycle()
     val today = DateUtils.todayStr()
     var showExamDatePicker by remember { mutableStateOf(false) }
-    var manualMinutesText by remember { mutableStateOf("30") }
     var newTaskTitle by remember { mutableStateOf("") }
-    var topicMenuExpanded by remember { mutableStateOf(false) }
+    var hideGuestBanner by remember { mutableStateOf(false) }
+    var guestSignInError by remember { mutableStateOf<String?>(null) }
 
     val minsToday = StatsUtils.minutesByDay(state)[today] ?: 0
     val goalMin = (state.profile.dailyHours * 60.0).roundToInt().coerceAtLeast(30)
     val daysLeft = state.profile.examDate?.let { DateUtils.daysBetween(today, it) }
     val week = StatsUtils.weekMinutes(state)
-    val maxW = max(60, week.maxOfOrNull { it.min } ?: 60)
     val weekTotal = week.sumOf { it.min }
     val next = StatsUtils.nextTopic(state)
     val dueCount = StatsUtils.dueCards(state).size
@@ -122,7 +120,13 @@ fun DashboardScreen(
         item {
             PageHeader(
                 title = "مرحباً بك في مسارك نحو ISTQB 👋",
-                sub = "خطوة صغيرة كل يوم، والشهادة في النهاية."
+                sub = "خطوة صغيرة كل يوم، والشهادة في النهاية.",
+                trailing = {
+                    DynamicThemeToggleButton(
+                        onToggle = { isDark -> viewModel.toggleLightDarkTheme(isDark) },
+                        testTag = "dashboard_theme_toggle"
+                    )
+                }
             )
         }
 
@@ -163,6 +167,54 @@ fun DashboardScreen(
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                         }
+                    }
+                }
+            }
+        }
+
+        // Optional Cloud Sync Prompt (when browsing without login)
+        if (viewModel.isGuest && !hideGuestBanner) {
+            item {
+                SectionCard(
+                    borderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.45f)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "وضع التصفح الحر (بدون تسجيل)",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = "يمكنك استخدام التطبيق بحرية، أو تسجيل الدخول بحساب Google في أي وقت لمزامنة تقدمك سحابياً.",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = qa.muted
+                            )
+                        }
+                        TextButton(
+                            onClick = { hideGuestBanner = true },
+                            modifier = Modifier.testTag("dismiss_guest_banner")
+                        ) {
+                            Text("لاحقاً")
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                    GoogleSignInButton(
+                        onAuthSuccess = { guestSignInError = null },
+                        onAuthError = { msg -> guestSignInError = msg }
+                    )
+                    if (!guestSignInError.isNullOrBlank()) {
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text(
+                            text = guestSignInError!!,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = qa.bad
+                        )
                     }
                 }
             }
@@ -239,11 +291,12 @@ fun DashboardScreen(
             }
         }
 
-        // Daily Study Streak Counter (Firestore-persisted)
+        // Daily Study Streak Counter (Firestore-persisted when signed in)
         item {
             DailyStreakCard(
                 state = state,
                 checkingIn = checkingInStreak,
+                isGuest = viewModel.isGuest,
                 onCheckInToday = { viewModel.checkInDailyStudy() }
             )
         }
@@ -258,6 +311,21 @@ fun DashboardScreen(
                 onToggleModuleComplete = { chapterId, completed ->
                     viewModel.setChapterCompleted(chapterId, completed)
                 }
+            )
+        }
+
+        // Visual ISTQB Syllabus Roadmap with Checkmarks
+        item {
+            SyllabusRoadmapCard(
+                state = state,
+                onOpenTopic = onOpenTopic,
+                onToggleModuleComplete = { chapterId, completed ->
+                    viewModel.setChapterCompleted(chapterId, completed)
+                },
+                onToggleTopicComplete = { topicId, completed ->
+                    viewModel.setProgress("t:$topicId", if (completed) "done" else null)
+                },
+                mutatingChapterIds = mutatingChapterIds
             )
         }
 
@@ -329,195 +397,45 @@ fun DashboardScreen(
             }
         }
 
-        // Pomodoro Timer Card
+        // Quick Spaced-Repetition Flashcard Practice (Firestore-backed)
         item {
-            SectionCard {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = if (timer.mode == TimerMode.FOCUS) "🎯 جلسة تركيز (Pomodoro)" else "☕ وقت راحة",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = qa.muted
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    LtrContent {
-                        Text(
-                            text = DateUtils.fmtTime(timer.leftSeconds),
-                            fontFamily = JetBrainsMono,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 48.sp,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-
-                    if (timer.mode == TimerMode.FOCUS) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        val selectedTopic = SyllabusData.findTopic(timer.topicId)
-                        Box {
-                            OutlinedButton(
-                                onClick = { topicMenuExpanded = true },
-                                modifier = Modifier.testTag("timer_topic_selector")
-                            ) {
-                                Text(
-                                    text = selectedTopic?.let { "${it.id} — ${it.ar}" } ?: "بدون موضوع محدد",
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                    modifier = Modifier.weight(1f, fill = false)
-                                )
-                                Icon(Icons.Default.ArrowDropDown, contentDescription = "اختر الموضوع")
-                            }
-                            DropdownMenu(
-                                expanded = topicMenuExpanded,
-                                onDismissRequest = { topicMenuExpanded = false }
-                            ) {
-                                DropdownMenuItem(
-                                    text = { Text("بدون موضوع محدد") },
-                                    onClick = {
-                                        viewModel.setTimerTopic("")
-                                        topicMenuExpanded = false
-                                    }
-                                )
-                                SyllabusData.ALL_TOPICS.forEach { t ->
-                                    DropdownMenuItem(
-                                        text = { Text("${t.id} — ${t.ar}", maxLines = 1, overflow = TextOverflow.Ellipsis) },
-                                        onClick = {
-                                            viewModel.setTimerTopic(t.id)
-                                            topicMenuExpanded = false
-                                        }
-                                    )
-                                }
-                            }
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Button(
-                            onClick = { if (timer.running) viewModel.pauseTimer() else viewModel.startTimer() },
-                            modifier = Modifier.testTag("timer_start_pause")
-                        ) {
-                            Text(if (timer.running) "إيقاف مؤقت" else "ابدأ")
-                        }
-                        OutlinedButton(
-                            onClick = { viewModel.resetTimer() },
-                            modifier = Modifier.testTag("timer_reset")
-                        ) {
-                            Text("إعادة")
-                        }
-                        OutlinedButton(
-                            onClick = { viewModel.skipTimer() },
-                            modifier = Modifier.testTag("timer_skip")
-                        ) {
-                            Text(if (timer.mode == TimerMode.FOCUS) "تخطي للراحة" else "تخطي للتركيز")
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Text(
-                        text = "جلسات مكتملة اليوم عبر المؤقت: ${timer.completedToday}. تُسجَّل الدقائق تلقائياً عند اكتمال جلسة التركيز (${state.profile.focusMin} د).",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = qa.muted
-                    )
-
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = qa.border)
-
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("درست خارج التطبيق؟", style = MaterialTheme.typography.bodyMedium, color = qa.muted)
-                        OutlinedTextField(
-                            value = manualMinutesText,
-                            onValueChange = { manualMinutesText = it.filter { ch -> ch.isDigit() }.take(3) },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            singleLine = true,
-                            modifier = Modifier
-                                .width(74.dp)
-                                .testTag("manual_minutes_input"),
-                            suffix = { Text("د", fontSize = 12.sp) }
-                        )
-                        Button(
-                            onClick = {
-                                val mins = manualMinutesText.toIntOrNull() ?: 0
-                                if (mins > 0) viewModel.addSession(mins, "manual")
-                            },
-                            modifier = Modifier.testTag("manual_session_add")
-                        ) {
-                            Text("تسجيل")
-                        }
-                    }
-                }
-            }
+            QuickFlashcardPracticeCard(
+                state = state,
+                isGuest = viewModel.isGuest,
+                isSyncing = syncingFlashcards,
+                onReviewCard = { cardId, known -> viewModel.reviewCard(cardId, known) },
+                onRefreshFromFirestore = { viewModel.refreshFlashcardsFromFirestore() },
+                onOpenAllCards = onOpenCards
+            )
         }
 
-        // Last 7 days bar chart
+        // Pomodoro Timer Card (Firestore focus tracking, XP points & badges)
         item {
-            SectionCard {
-                Text(
-                    text = "آخر 7 أيام",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(12.dp))
-                LtrContent {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(130.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.Bottom
-                    ) {
-                        week.forEach { w ->
-                            val frac = (w.min.toFloat() / maxW.toFloat()).coerceIn(0f, 1f)
-                            Column(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .fillMaxHeight(),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Bottom
-                            ) {
-                                Text(
-                                    text = if (w.min > 0) "${w.min}" else "",
-                                    fontSize = 10.sp,
-                                    color = qa.muted
-                                )
-                                Spacer(modifier = Modifier.height(2.dp))
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .weight(1f),
-                                    contentAlignment = Alignment.BottomCenter
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .fillMaxHeight(if (w.min > 0) maxOf(0.08f, frac) else 0.04f)
-                                            .clip(RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp))
-                                            .background(
-                                                MaterialTheme.colorScheme.primary.copy(
-                                                    alpha = if (w.min > 0) 1f else 0.2f
-                                                )
-                                            )
-                                    )
-                                }
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(
-                                    text = DateUtils.dayLabel(w.day),
-                                    fontSize = 11.sp,
-                                    color = qa.muted,
-                                    maxLines = 1
-                                )
-                            }
-                        }
-                    }
+            PomodoroTimerCard(
+                state = state,
+                timer = timer,
+                isGuest = viewModel.isGuest,
+                onStart = { viewModel.startTimer() },
+                onPause = { viewModel.pauseTimer() },
+                onReset = { viewModel.resetTimer() },
+                onSkip = { viewModel.skipTimer() },
+                onFinishAndLog = { viewModel.finishAndLogActiveFocus() },
+                onSelectTopic = { viewModel.setTimerTopic(it) },
+                onSelectPreset = { focus, brk -> viewModel.applyPomodoroPreset(focus, brk) },
+                onLogManualMinutes = { mins -> viewModel.addSession(mins, "manual") },
+                onDismissReward = { viewModel.dismissRewardMessage() },
+                onOpenProgress = onOpenProgress
+            )
+        }
+
+        // Weekly Activity Chart (Pomodoro & Manual study sessions)
+        item {
+            WeeklyActivityChartCard(
+                state = state,
+                onStartFocusClick = {
+                    if (!timer.running) viewModel.startTimer()
                 }
-            }
+            )
         }
 
         // Today's Tasks

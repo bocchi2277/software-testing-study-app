@@ -43,12 +43,13 @@ import androidx.compose.ui.unit.dp
 import androidx.credentials.CredentialManager
 import com.example.model.AppState
 import com.example.ui.QaViewModel
+import com.example.ui.auth.GoogleSignInButton
 import com.example.ui.auth.signOut
 import com.example.ui.components.ConfirmActionDialog
 import com.example.ui.components.PageHeader
 import com.example.ui.components.QaDatePickerDialog
-import com.example.ui.components.QaFilterChip
 import com.example.ui.components.SectionCard
+import com.example.ui.components.ThemeModeSelectorCard
 import com.example.ui.theme.LocalQaColors
 import com.example.util.DateUtils
 import com.google.firebase.Firebase
@@ -80,6 +81,7 @@ fun SettingsScreen(
     var showClearAttemptsDialog by remember { mutableStateOf(false) }
     var showResetAllDialog by remember { mutableStateOf(false) }
     var showSignOutDialog by remember { mutableStateOf(false) }
+    var authError by remember { mutableStateOf<String?>(null) }
 
     val exportLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("application/json")
@@ -225,35 +227,59 @@ fun SettingsScreen(
             SectionCard {
                 Text("حسابك السحابي", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(10.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.AccountCircle,
-                        contentDescription = "الحساب",
-                        tint = MaterialTheme.colorScheme.primary
+                if (currentUser == null) {
+                    Text(
+                        text = "أنت تتصفح التطبيق حالياً بدون حساب (وضع الضيف). سجّل الدخول بحساب Google لحفظ تقدمك ومزامنته عبر أجهزتك.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = qa.muted
                     )
-                    Column(modifier = Modifier.weight(1f)) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    GoogleSignInButton(
+                        onAuthSuccess = {
+                            authError = null
+                            statusMsg = "تم تسجيل الدخول ومزامنة حسابك."
+                        },
+                        onAuthError = { msg -> authError = msg }
+                    )
+                    if (!authError.isNullOrBlank()) {
+                        Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = currentUser?.displayName?.takeIf { it.isNotBlank() } ?: "مستخدم Google",
-                            fontWeight = FontWeight.Bold
+                            text = authError!!,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = qa.bad
                         )
-                        if (!currentUser?.email.isNullOrBlank()) {
-                            Text(
-                                text = currentUser?.email ?: "",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = qa.muted
-                            )
-                        }
                     }
-                    OutlinedButton(
-                        onClick = { showSignOutDialog = true },
-                        modifier = Modifier.testTag("sign_out_button")
+                } else {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Icon(Icons.Filled.Logout, contentDescription = null)
-                        Text("خروج")
+                        Icon(
+                            imageVector = Icons.Filled.AccountCircle,
+                            contentDescription = "الحساب",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = currentUser.displayName?.takeIf { it.isNotBlank() } ?: "مستخدم Google",
+                                fontWeight = FontWeight.Bold
+                            )
+                            if (!currentUser.email.isNullOrBlank()) {
+                                Text(
+                                    text = currentUser.email ?: "",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = qa.muted
+                                )
+                            }
+                        }
+                        OutlinedButton(
+                            onClick = { showSignOutDialog = true },
+                            modifier = Modifier.testTag("sign_out_button")
+                        ) {
+                            Icon(Icons.Filled.Logout, contentDescription = null)
+                            Text("خروج")
+                        }
                     }
                 }
             }
@@ -261,20 +287,10 @@ fun SettingsScreen(
 
         // Theme Settings
         item {
-            SectionCard {
-                Text("المظهر", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                Spacer(modifier = Modifier.height(10.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    listOf("auto" to "تلقائي", "light" to "فاتح", "dark" to "داكن").forEach { (key, label) ->
-                        QaFilterChip(
-                            text = label,
-                            selected = p.theme == key,
-                            onClick = { viewModel.updateProfile { it.copy(theme = key) } },
-                            testTag = "theme_$key"
-                        )
-                    }
-                }
-            }
+            ThemeModeSelectorCard(
+                selectedTheme = p.theme,
+                onSelectTheme = { mode -> viewModel.setThemeMode(mode) }
+            )
         }
 
         // Study Settings
