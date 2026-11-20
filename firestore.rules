@@ -1,0 +1,255 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Shared Primitives ---
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidTimestampField(ts) {
+      return ts is timestamp && ts <= request.time;
+    }
+
+    // --- Entity Validation Helpers ---
+    function isValidUserProfile(data) {
+      return data.userId is string && data.userId == request.auth.uid &&
+             (!('examDate' in data) || data.examDate == null || (data.examDate is string && data.examDate.size() >= 8 && data.examDate.size() <= 20)) &&
+             data.startDate is string && data.startDate.size() >= 8 && data.startDate.size() <= 20 &&
+             (data.dailyHours is int || data.dailyHours is float) && data.dailyHours >= 0.5 && data.dailyHours <= 12.0 &&
+             data.startTime is string && data.startTime.size() >= 4 && data.startTime.size() <= 10 &&
+             data.theme is string && data.theme in ['auto', 'light', 'dark'] &&
+             data.focusMin is int && data.focusMin >= 5 && data.focusMin <= 120 &&
+             data.breakMin is int && data.breakMin >= 1 && data.breakMin <= 60 &&
+             (!('currentStreak' in data) || (data.currentStreak is int && data.currentStreak >= 0 && data.currentStreak <= 36500)) &&
+             (!('bestStreak' in data) || (data.bestStreak is int && data.bestStreak >= 0 && data.bestStreak <= 36500)) &&
+             (!('lastStudyDate' in data) || data.lastStudyDate == null || (data.lastStudyDate is string && data.lastStudyDate.size() >= 8 && data.lastStudyDate.size() <= 20));
+    }
+
+    function isValidProgressEntry(data) {
+      return data.key is string && data.key.size() >= 1 && data.key.size() <= 120 &&
+             data.value is string && data.value.size() >= 1 && data.value.size() <= 200;
+    }
+
+    function isValidStudySession(data) {
+      return data.day is string && data.day.size() >= 8 && data.day.size() <= 20 &&
+             data.minutes is int && data.minutes >= 1 && data.minutes <= 600 &&
+             data.kind is string && data.kind.size() >= 1 && data.kind.size() <= 30 &&
+             (!('topic' in data) || data.topic == null || (data.topic is string && data.topic.size() <= 30));
+    }
+
+    function isValidCardState(data) {
+      return data.box is int && data.box >= 1 && data.box <= 5 &&
+             data.due is string && data.due.size() >= 8 && data.due.size() <= 20 &&
+             data.reps is int && data.reps >= 0 && data.reps <= 100000 &&
+             data.lapses is int && data.lapses >= 0 && data.lapses <= 100000;
+    }
+
+    function isValidQuizAttempt(data) {
+      return data.questionId is string && data.questionId.size() >= 1 && data.questionId.size() <= 30 &&
+             data.correct is bool &&
+             data.mode is string && data.mode.size() >= 1 && data.mode.size() <= 20 &&
+             data.at is string && data.at.size() >= 8 && data.at.size() <= 40;
+    }
+
+    function isValidExamResult(data) {
+      return data.score is int && data.score >= 0 && data.score <= 100 &&
+             data.total is int && data.total >= 1 && data.total <= 100 &&
+             data.seconds is int && data.seconds >= 0 && data.seconds <= 36000 &&
+             data.breakdown is map && data.breakdown.size() <= 10 &&
+             data.at is string && data.at.size() >= 8 && data.at.size() <= 40;
+    }
+
+    function isValidNoteItem(data) {
+      return data.title is string && data.title.size() >= 1 && data.title.size() <= 200 &&
+             data.body is string && data.body.size() <= 20000 &&
+             (!('topic' in data) || data.topic == null || (data.topic is string && data.topic.size() <= 30)) &&
+             data.updatedAtIso is string && data.updatedAtIso.size() >= 8 && data.updatedAtIso.size() <= 40;
+    }
+
+    function isValidTaskItem(data) {
+      return data.title is string && data.title.size() >= 1 && data.title.size() <= 200 &&
+             data.day is string && data.day.size() >= 8 && data.day.size() <= 20 &&
+             data.done is bool;
+    }
+
+    // --- Collection Rules ---
+    match /users/{userId} {
+      allow get: if isOwner(userId) && isValidId(userId);
+      allow list: if false;
+
+      allow create: if isOwner(userId) &&
+                       isValidId(userId) &&
+                       incoming().keys().hasAll(['userId', 'startDate', 'dailyHours', 'startTime', 'theme', 'focusMin', 'breakMin', 'createdAt', 'updatedAt']) &&
+                       incoming().keys().hasOnly(['userId', 'examDate', 'startDate', 'dailyHours', 'startTime', 'theme', 'focusMin', 'breakMin', 'currentStreak', 'bestStreak', 'lastStudyDate', 'createdAt', 'updatedAt']) &&
+                       isValidTimestampField(incoming().createdAt) &&
+                       isValidTimestampField(incoming().updatedAt) &&
+                       isValidUserProfile(incoming());
+
+      allow update: if isOwner(userId) &&
+                       isValidId(userId) &&
+                       isValidUserProfile(incoming()) &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt &&
+                       isValidTimestampField(incoming().updatedAt) &&
+                       incoming().diff(existing()).affectedKeys().hasOnly(['examDate', 'startDate', 'dailyHours', 'startTime', 'theme', 'focusMin', 'breakMin', 'currentStreak', 'bestStreak', 'lastStudyDate', 'updatedAt']);
+
+      allow delete: if isOwner(userId) && isValidId(userId);
+
+      match /progress/{progressId} {
+        allow get: if isOwner(userId) && isValidId(progressId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+                         isValidId(progressId) &&
+                         incoming().keys().hasAll(['key', 'value', 'createdAt', 'updatedAt']) &&
+                         incoming().keys().hasOnly(['key', 'value', 'createdAt', 'updatedAt']) &&
+                         isValidTimestampField(incoming().createdAt) &&
+                         isValidTimestampField(incoming().updatedAt) &&
+                         isValidProgressEntry(incoming());
+
+        allow update: if isOwner(userId) &&
+                         isValidId(progressId) &&
+                         isValidProgressEntry(incoming()) &&
+                         incoming().key == existing().key &&
+                         incoming().createdAt == existing().createdAt &&
+                         isValidTimestampField(incoming().updatedAt) &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['value', 'updatedAt']);
+
+        allow delete: if isOwner(userId) && isValidId(progressId);
+      }
+
+      match /sessions/{sessionId} {
+        allow get: if isOwner(userId) && isValidId(sessionId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+                         isValidId(sessionId) &&
+                         incoming().keys().hasAll(['day', 'minutes', 'kind', 'createdAt']) &&
+                         incoming().keys().hasOnly(['day', 'minutes', 'kind', 'topic', 'createdAt']) &&
+                         isValidTimestampField(incoming().createdAt) &&
+                         isValidStudySession(incoming());
+
+        allow update: if false;
+        allow delete: if isOwner(userId) && isValidId(sessionId);
+      }
+
+      match /cards/{cardId} {
+        allow get: if isOwner(userId) && isValidId(cardId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+                         isValidId(cardId) &&
+                         incoming().keys().hasAll(['box', 'due', 'reps', 'lapses', 'createdAt', 'updatedAt']) &&
+                         incoming().keys().hasOnly(['box', 'due', 'reps', 'lapses', 'createdAt', 'updatedAt']) &&
+                         isValidTimestampField(incoming().createdAt) &&
+                         isValidTimestampField(incoming().updatedAt) &&
+                         isValidCardState(incoming());
+
+        allow update: if isOwner(userId) &&
+                         isValidId(cardId) &&
+                         isValidCardState(incoming()) &&
+                         incoming().createdAt == existing().createdAt &&
+                         isValidTimestampField(incoming().updatedAt) &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['box', 'due', 'reps', 'lapses', 'updatedAt']);
+
+        allow delete: if isOwner(userId) && isValidId(cardId);
+      }
+
+      match /attempts/{attemptId} {
+        allow get: if isOwner(userId) && isValidId(attemptId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+                         isValidId(attemptId) &&
+                         incoming().keys().hasAll(['questionId', 'correct', 'mode', 'at', 'createdAt']) &&
+                         incoming().keys().hasOnly(['questionId', 'correct', 'mode', 'at', 'createdAt']) &&
+                         isValidTimestampField(incoming().createdAt) &&
+                         isValidQuizAttempt(incoming());
+
+        allow update: if false;
+        allow delete: if isOwner(userId) && isValidId(attemptId);
+      }
+
+      match /exams/{examId} {
+        allow get: if isOwner(userId) && isValidId(examId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+                         isValidId(examId) &&
+                         incoming().keys().hasAll(['score', 'total', 'seconds', 'breakdown', 'at', 'createdAt']) &&
+                         incoming().keys().hasOnly(['score', 'total', 'seconds', 'breakdown', 'at', 'createdAt']) &&
+                         isValidTimestampField(incoming().createdAt) &&
+                         isValidExamResult(incoming());
+
+        allow update: if false;
+        allow delete: if isOwner(userId) && isValidId(examId);
+      }
+
+      match /notes/{noteId} {
+        allow get: if isOwner(userId) && isValidId(noteId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+                         isValidId(noteId) &&
+                         incoming().keys().hasAll(['title', 'body', 'updatedAtIso', 'createdAt', 'updatedAt']) &&
+                         incoming().keys().hasOnly(['title', 'body', 'topic', 'updatedAtIso', 'createdAt', 'updatedAt']) &&
+                         isValidTimestampField(incoming().createdAt) &&
+                         isValidTimestampField(incoming().updatedAt) &&
+                         isValidNoteItem(incoming());
+
+        allow update: if isOwner(userId) &&
+                         isValidId(noteId) &&
+                         isValidNoteItem(incoming()) &&
+                         incoming().createdAt == existing().createdAt &&
+                         isValidTimestampField(incoming().updatedAt) &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['title', 'body', 'topic', 'updatedAtIso', 'updatedAt']);
+
+        allow delete: if isOwner(userId) && isValidId(noteId);
+      }
+
+      match /tasks/{taskId} {
+        allow get: if isOwner(userId) && isValidId(taskId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+                         isValidId(taskId) &&
+                         incoming().keys().hasAll(['title', 'day', 'done', 'createdAt', 'updatedAt']) &&
+                         incoming().keys().hasOnly(['title', 'day', 'done', 'createdAt', 'updatedAt']) &&
+                         isValidTimestampField(incoming().createdAt) &&
+                         isValidTimestampField(incoming().updatedAt) &&
+                         isValidTaskItem(incoming());
+
+        allow update: if isOwner(userId) &&
+                         isValidId(taskId) &&
+                         isValidTaskItem(incoming()) &&
+                         incoming().createdAt == existing().createdAt &&
+                         isValidTimestampField(incoming().updatedAt) &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['title', 'day', 'done', 'updatedAt']);
+
+        allow delete: if isOwner(userId) && isValidId(taskId);
+      }
+    }
+  }
+}

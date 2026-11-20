@@ -1,0 +1,8 @@
+{
+  "name": "مسار QA",
+  "description": "منصة عربية لدراسة Software Testing والتحضير لشهادة ISTQB CTFL v4.0: منهج، اختبارات، بطاقات مراجعة متباعدة، مختبر تفاعلي، ومهارات عملية.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
