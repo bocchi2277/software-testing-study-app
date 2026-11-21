@@ -33,5 +33,13 @@
 
 * **اللغة والواجهة:** Kotlin + Jetpack Compose + Material Design 3 + Navigation Compose (Type-safe `@Serializable` routes) + WindowSizeClass (تخطيط متجاوب مع شاشات الهواتف والأجهزة اللوحية).
 * **الحساب والمزامنة السحابية:** Firebase Authentication (تسجيل الدخول بحساب Google عبر Jetpack Credential Manager) وCloud Firestore لحفظ ومزامنة التقدم والبطاقات والاختبارات والملاحظات عبر الحساب الشخصي، مع دعم العمل محلياً وتصدير/استيراد النسخ الاحتياطية JSON.
-* **اختبارات الوحدة (JVM Unit Tests):** تغطي خوارزمية Leitner، أوزان الجاهزية والامتحان الرسمي، نزاهة بنك الأسئلة (توازن طول الخيارات ومنع الصيغ المعتمدة على الترتيب)، وحفظ حالة الجلسة والمؤقت عبر `gradle :app:testDebugUnitTest`.
+* **اختبارات الوحدة (JVM Unit Tests):** تغطي خوارزمية Leitner، أوزان الجاهزية والامتحان الرسمي، نزاهة بنك الأسئلة (توازن طول الخيارات في الحدين الأعلى والأدنى بالعربية والإنجليزية ومنع الصيغ المعتمدة على الترتيب)، وحفظ حالة الجلسة والمؤقت عبر `gradle :app:testDebugUnitTest`.
 * **الخطوط والأصول:** IBM Plex Sans Arabic وJetBrains Mono مع أيقونة تكيفية مخصصة (`Adaptive Launcher Icon`).
+
+---
+
+## البناء محلياً بعد الاستنساخ من GitHub
+
+* المتطلبات: Android Studio / JDK 17+ مع Android SDK (`compileSdk 36`, `minSdk 26`).
+* ملف `app/google-services.json` غير مضمَّن في المستودع العام حفاظاً على إعدادات مشروع Firebase؛ لذا عند استنساخ المشروع خارج بيئة التطوير السحابية يجب ربطه بمشروع Firebase الخاص بك (تفعيل **Google Sign-In** في Authentication و**Cloud Firestore**) ووضع `google-services.json` داخل مجلد `app/` قبل تشغيل البناء أو الاختبارات (`gradle :app:testDebugUnitTest`).
+

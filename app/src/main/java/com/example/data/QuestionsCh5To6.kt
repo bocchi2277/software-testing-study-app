@@ -6,19 +6,19 @@ internal object QuestionsCh5To6 {
         RawQ(
             id = "q041", ch = 5,
             q = "كيف يتحدد مستوى المخاطرة (Risk level) وفق منهج CTFL v4.0؟",
-            correct = "من احتمال الحدوث (Likelihood) وأثره (Impact)",
+            correct = "من احتمال حدوث الخطر (Likelihood) وشدة أثره (Impact)",
             wrong = listOf(
-                "قسمة عدد المطورين العاملين على المشروع على عدد المختبرين",
-                "مجموع حالات الاختبار المنفذة مطروحاً منه عدد العيوب المغلقة",
-                "زمن تنفيذ مجموعة الانحدار الآلية في بيئة الاختبار الوظيفي"
+                "قسمة عدد المطورين على المختبرين",
+                "مجموع حالات الاختبار ناقص المغلقة",
+                "زمن تنفيذ مجموعة الانحدار في البيئة"
             ),
             exp = "القسم 5.2.1: يُعبَّر عن مستوى المخاطرة بـ Risk likelihood (احتمال الحدوث) وRisk impact (شدة الضرر).",
             qEn = "How is the level of a risk determined in the ISTQB CTFL v4.0 syllabus?",
-            correctEn = "Combining risk likelihood and risk impact",
+            correctEn = "Combining the likelihood of an event and its impact",
             wrongEn = listOf(
-                "By dividing the number of software developers by the number of testers",
-                "By subtracting closed defect reports from executed test cases",
-                "By measuring total runtime of automated regression suites in staging"
+                "Dividing developers by testers count",
+                "Subtracting closed bugs from tests",
+                "Measuring regression runtime in staging"
             ),
             expEn = "Section 5.2.1 defines risk level by two factors: risk likelihood (probability) and risk impact (harm/severity), often combined via multiplication."
         ),
@@ -27,7 +27,7 @@ internal object QuestionsCh5To6 {
             q = "أي مما يلي مثال على Project risk وليس Product risk؟",
             correct = "تأخر تسليم بيئة الاختبار أو استقالة خبير",
             wrong = listOf(
-                "بطء زمن استجابة صفحة الدفع عن 5 ثوانٍ تحت الضغط الطبيعي",
+                "بطء صفحة الدفع عن 5 ثوانٍ",
                 "ثغرة حقن SQL تسمح بكشف بيانات حسابات العملاء في القاعدة",
                 "خطأ حسابي في معادلة احتساب الضريبة داخل الفاتورة النهائية"
             ),
@@ -35,7 +35,7 @@ internal object QuestionsCh5To6 {
             qEn = "Which of the following is an example of a PROJECT risk rather than a product risk?",
             correctEn = "Delayed delivery of the test environment",
             wrongEn = listOf(
-                "Checkout page response times exceeding 5 seconds under normal traffic",
+                "Checkout latency over 5 seconds",
                 "An SQL injection vulnerability exposing sensitive customer records",
                 "An incorrect rounding formula miscalculating sales tax on invoices"
             ),
@@ -55,19 +55,19 @@ internal object QuestionsCh5To6 {
         RawQ(
             id = "q044", ch = 5,
             q = "أي عبارة تصف شكل Test Pyramid القياسي بدقة؟",
-            correct = "قاعدة واسعة للوحدة السريعة وأقل للواجهات E2E",
+            correct = "قاعدة واسعة لاختبارات الوحدة السريعة وأقل للواجهات E2E",
             wrong = listOf(
-                "التركيز على اختبارات واجهة المستخدم اليدوية بنسبة 80% والوحدة بنسبة 5%",
-                "تنفيذ اختبارات الأداء والأمان فقط قبل اختبارات الوحدة في كل دفعة",
-                "مساواة عدد اختبارات النظام البطيئة بعدد اختبارات الوحدة السريعة تماماً"
+                "الاعتماد على UI بنسبة 80%",
+                "تنفيذ اختبارات الأمان قبل الوحدة",
+                "مساواة عدد UI بعدد اختبارات الوحدة"
             ),
             exp = "Test pyramid يوصي بالاعتماد الأكبر على اختبارات سريعة وعالية العزل (Unit/API) وتقليل UI الهشة والبطيئة.",
             qEn = "Which statement BEST describes the standard Test Pyramid model?",
-            correctEn = "Broad base of fast unit tests; fewest slow E2E UI tests",
+            correctEn = "Broad base of fast unit tests and fewest slow UI tests",
             wrongEn = listOf(
-                "Focusing 80% of automation on slow UI tests and only 5% on unit tests",
-                "Executing load and penetration tests prior to running component tests",
-                "Maintaining an identical count of end-to-end UI tests and unit tests"
+                "Focusing 80% on UI automation",
+                "Running load tests before unit tests",
+                "Equal counts of UI and unit tests"
             ),
             expEn = "The test pyramid shows high granularity and speed at the bottom (unit/component) and decreasing test counts toward slower UI end-to-end tests."
         ),
@@ -87,7 +87,7 @@ internal object QuestionsCh5To6 {
             q = "ما الغرض الرئيسي من Exit criteria (أو Definition of Done في Agile)؟",
             correct = "شروط إعلان اكتمال نشاط أو مستوى اختبار",
             wrong = listOf(
-                "تحديد الحد الأدنى من جاهزية البيئة والبيانات قبل بدء تنفيذ الاختبارات",
+                "جاهزية البيئة والبيانات للبدء",
                 "توثيق خطوات إعادة إنتاج خطأ برمجي محدد داخل تقرير العيوب",
                 "حساب التكلفة السنوية لتراخيص أدوات إدارة الاختبار والتقارير"
             ),
@@ -95,7 +95,7 @@ internal object QuestionsCh5To6 {
             qEn = "What is the primary purpose of exit criteria (or Definition of Done in Agile) in test planning?",
             correctEn = "Conditions required to declare a test activity done",
             wrongEn = listOf(
-                "Specifying the prerequisites needed before test execution can begin",
+                "Prerequisites to start execution",
                 "Documenting exact reproduction steps inside an individual bug report",
                 "Calculating annual licensing renewals for test management software"
             ),
@@ -104,19 +104,19 @@ internal object QuestionsCh5To6 {
         RawQ(
             id = "q047", ch = 5,
             q = "ما الفرق بين Severity وPriority في Defect report؟",
-            correct = "Severity تقيس الأثر التقني؛ وPriority إلحاح الإصلاح",
+            correct = "Severity تقيس الأثر التقني؛ وPriority تحدد إلحاح الإصلاح",
             wrong = listOf(
-                "Severity يحددها مدير المبيعات فقط، بينما Priority هي درجة صعوبة كتابة الكود",
-                "كلاهما مصطلح واحد ويجب أن تتطابق قيمتهما دائماً في كل تقرير عيب",
-                "Priority تصف بيئة التشغيل، بينما Severity تحدد اسم المبرمج المسؤول"
+                "Severity يحددها فريق المبيعات فقط",
+                "كلاهما مصطلح واحد دائماً",
+                "Priority تصف البيئة التشغيلية"
             ),
             exp = "مثال كلاسيكي: خطأ إملائي في شعار الصفحة الرئيسية (Severity منخفضة لكن Priority عالية للسمعة التجارية).",
             qEn = "How do 'severity' and 'priority' differ in a defect report?",
-            correctEn = "Severity is technical impact; priority is fix urgency",
+            correctEn = "Severity measures technical impact; priority sets fix urgency",
             wrongEn = listOf(
-                "Severity is set exclusively by sales teams; priority measures coding effort",
-                "Both terms are synonyms and must always hold identical values for every bug",
-                "Priority records the test environment; severity names the assigned developer"
+                "Severity is set by sales teams",
+                "Both hold identical bug values",
+                "Priority names the assigned dev"
             ),
             expEn = "Severity assesses technical failure impact; priority dictates fix scheduling based on business value and risk."
         ),
@@ -125,7 +125,7 @@ internal object QuestionsCh5To6 {
             q = "كيف تدعم Configuration Management (CM) موثوقية أنشطة الاختبار؟",
             correct = "بضبط نسخ الكود والبيئات كـ Baselines للتتبع وإعادة الإنتاج",
             wrong = listOf(
-                "بتحويل جميع الاختبارات اليدوية إلى اختبارات أداء آلية عالية الضغط",
+                "بتحويل الاختبارات اليدوية لأداء",
                 "بمنع المطورين والمختبرين من إنشاء فروع كود أثناء مراحل التطوير",
                 "بإلغاء الحاجة إلى تقارير العيوب والربط التتبعي (Traceability)"
             ),
@@ -133,7 +133,7 @@ internal object QuestionsCh5To6 {
             qEn = "How does Configuration Management (CM) directly support reliable testing?",
             correctEn = "Versioning code, testware, and environments as baselines",
             wrongEn = listOf(
-                "By automatically converting manual functional scripts into load tests",
+                "Converting manual scripts into load tests",
                 "By prohibiting developers and testers from using source control branches",
                 "By eliminating the need for defect tracking and requirements traceability"
             ),
@@ -153,19 +153,19 @@ internal object QuestionsCh5To6 {
         RawQ(
             id = "q050", ch = 5,
             q = "ما أفضل ترتيب عند تطبيق Risk-based testing لتنفيذ حالات الاختبار في وقت محدود؟",
-            correct = "تشغيل اختبارات Product risks الأعلى خطورة أولاً",
+            correct = "تشغيل اختبارات Product risks الأعلى خطورة ومراعاة الاعتماديات أولاً",
             wrong = listOf(
-                "ترتيب حالات الاختبار أبجدياً حسب اسم المختبر الذي كتبها في النظام",
-                "تأجيل الميزات الحرجة والأكثر مخاطرة إلى اليوم الأخير قبل الإطلاق",
-                "تنفيذ حالات الاختبار الأسرع فقط وتجاهل المدفوعات والأمان تماماً"
+                "ترتيب الحالات أبجدياً حسب المؤلف",
+                "تأجيل الميزات الحرجة إلى اليوم الأخير",
+                "تنفيذ الأسرع وتجاهل الأمان"
             ),
             exp = "في الاختبار المبني على المخاطر تُنفَّذ الاختبارات الموجهة للمناطق الأعلى خطراً أولاً لضمان اكتشاف العيوب الحرجة مبكراً.",
             qEn = "When execution time is constrained under risk-based testing, how should test cases be prioritized?",
-            correctEn = "Run tests covering highest product risks first",
+            correctEn = "Execute tests for highest product risks first while respecting dependencies",
             wrongEn = listOf(
-                "Execute test cases alphabetically by the author's last name",
-                "Defer all high-risk payment and security tests until the final hour",
-                "Run only the shortest trivial UI tests and skip risk mitigation"
+                "Sort test cases alphabetically by author",
+                "Defer high-risk tests until launch",
+                "Run shortest UI checks and skip risks"
             ),
             expEn = "Risk-based prioritization ensures the most severe risks are mitigated earliest, balancing importance with test dependencies."
         ),
@@ -183,19 +183,19 @@ internal object QuestionsCh5To6 {
         RawQ(
             id = "q052", ch = 5,
             q = "ما المعلومة الجوهرية التي يعتمد عليها المطور أكثر من غيرها في Defect report لإيجاد سبب العيب بسرعة؟",
-            correct = "خطوات إعادة الإنتاج، النتيجة الفعلية والمتوقعة، والبيئة",
+            correct = "خطوات الإعادة، النتيجة المتوقعة والفعلية، والبيئة",
             wrong = listOf(
-                "اسم المختبر الكامل ورقمه الوظيفي وتاريخ ميلاده في سجلات الشركة",
-                "تقييم شخصي من المختبر حول كفاءة فريق التطوير وأسلوب برمجته",
-                "القائمة الكاملة لجميع الموظفين الذين حضروا اجتماع المراجعة الدوري"
+                "اسم المختبر ورقمه الوظيفي وساعات دوامه",
+                "تقييم شخصي حول كفاءة المطور وأسلوب برمجته",
+                "أسماء الموظفين الحاضرين لاجتماع المراجعة"
             ),
             exp = "Defect report الفعّال يوفر Steps to reproduce وActual/Expected results وسجلات البيئة لإعادة توليد العيب فوراً.",
             qEn = "Which information in a defect report is MOST critical for enabling a developer to quickly reproduce and investigate a failure?",
             correctEn = "Reproduction steps, expected vs. actual results, and setup",
             wrongEn = listOf(
-                "The tester's employee ID number and years of QA experience",
-                "Subjective commentary criticizing the developer's coding style",
-                "Attendance logs from previous sprint planning meetings and calls"
+                "Tester employee ID and total years of QA experience",
+                "Subjective commentary about developer coding style",
+                "Attendance logs from previous sprint review calls"
             ),
             expEn = "Section 5.5 highlights reproducible steps, expected/actual outcomes, build/environment versions, and logs/screenshots."
         ),
@@ -215,36 +215,36 @@ internal object QuestionsCh5To6 {
             q = "في شاشة «نبذة عنا» غير المستخدمة غالباً ظهر خطأ إملائي واضح في اسم المؤسسة الرسمي قبل يومين من حملة إعلامية كبرى. كيف تُقيّم Severity وPriority لهذا العيب؟",
             correct = "Severity منخفضة (تجميلي) و Priority عالية (للحملة)",
             wrong = listOf(
-                "Severity عالية جداً (انهيار كامل للنظام) و Priority منخفضة جداً",
-                "كلاهما منخفض جداً لأن الخطأ في النصوص لا يُسجَّل كـ defect برمجي",
-                "كلاهما حرج لأن كل خطأ إملائي يتلف سجلات قاعدة البيانات مباشرة"
+                "Severity عالية و Priority منخفضة للغاية",
+                "كلاهما منخفض لأن النصوص لا تسجل كـ defect",
+                "كلاهما حرج لأن كل خطأ إملائي يتلف القاعدة"
             ),
             exp = "التصنيف التقني للعيب التجميلي منخفض Severity، لكن السياق التجاري قبل الإطلاق يفرض Priority عالية لإصلاحه فوراً.",
             qEn = "Two days before a major press launch, a typo is spotted in the company's official name on a rarely visited 'About Us' screen. How should severity and priority be classified?",
             correctEn = "Low severity (cosmetic) and high priority (urgent launch)",
             wrongEn = listOf(
-                "High severity (critical system crash) and very low priority",
-                "Both low because text typos are excluded from defect trackers",
-                "Both critical because any spelling error corrupts database rows"
+                "High technical severity and low fix priority",
+                "Both low since text typos are not logged",
+                "Both critical because typos corrupt rows"
             ),
             expEn = "A typo causes minimal technical disruption (low severity) yet carries high commercial urgency prior to launch (high priority)."
         ),
         RawQ(
             id = "q088", ch = 5,
             q = "لديك 4 حالات اختبار: TC1 لميزة نادرة ومنخفضة الأثر (الأولوية 4)، TC2 لعملية الدفع الأساسية الحرجة (الأولوية 1)، لكن TC2 تعتمد تقنياً على TC3 (إنشاء حساب منخفض الأولوية). إذا رتّبنا التنفيذ مع مراعاة الاعتماديات، ما الترتيب الصحيح؟",
-            correct = "TC3 أولاً ثم TC2 لتلبية الاعتماد التقني",
+            correct = "تنفيذ TC3 أولاً ثم TC2 لتلبية الاعتماديات التقنية اللازمة",
             wrong = listOf(
-                "TC1 ثم TC4 وتجاهل الاعتماديات التقنية الخاصة بحالة الدفع TC2",
-                "TC2 مباشرة قبل TC3 رغم أن الحساب غير موجود بعد، مما يفشل البيئة",
-                "تأجيل TC2 وTC3 لنهاية الدورة لأن TC3 منخفضة الأولوية في القائمة"
+                "تشغيل TC1 أولاً ثم TC4 وتجاهل الاعتماد بين الحالات",
+                "تنفيذ TC2 مباشرة قبل TC3 دون إعداد الحساب",
+                "تأجيل كل من TC2 وTC3 إلى نهاية الدورة"
             ),
             exp = "القسم 5.1.5: إذا اعتمد اختبار عالي الأولوية (TC2) على اختبار أقل أولوية (TC3)، فيجب تنفيذ TC3 قبله.",
             qEn = "Test case TC2 covers high-risk checkout (Priority 1) but functionally depends on TC3 (account creation, Priority 3). Following CTFL v4.0 test prioritization rules, what order is required?",
             correctEn = "Run TC3 first, then TC2 to satisfy dependencies",
             wrongEn = listOf(
-                "Execute TC2 before TC3 even though no user account exists yet",
-                "Defer both TC3 and TC2 to the end because TC3 is lower priority",
-                "Run only Priority 1 tests and skip TC3 regardless of test failure"
+                "Execute TC2 directly before TC3 runs",
+                "Defer both TC3 and TC2 to end of sprint",
+                "Run Priority 1 and skip TC3 altogether"
             ),
             expEn = "Section 5.1.5 explains that if a higher-priority test case depends on a lower-priority test case, the prerequisite test must run first."
         ),
@@ -294,17 +294,17 @@ internal object QuestionsCh5To6 {
             q = "أي مما يلي يُعد مثالاً دقيقاً على Entry Criterion وليس Exit Criterion لاختبار النظام؟",
             correct = "جاهزية بيئة الاختبار ونشر البناء والبيانات",
             wrong = listOf(
-                "تحقيق تغطية 100% لجميع المتطلبات الحرجة وعدم بقاء عيوب حرجة مفتوحة",
-                "اعتماد تقرير إنجاز الاختبار (Test completion report) من أصحاب المصلحة",
-                "استيفاء حد زمن الاستجابة المطلوب لجميع نقاط النهاية في الخادم الإنتاجي"
+                "تغطية 100% للمتطلبات وعدم بقاء عيوب حرجة",
+                "اعتماد تقرير إنجاز الاختبار من أصحاب المصلحة",
+                "استيفاء حد زمن الاستجابة في الخادم الإنتاجي"
             ),
             exp = "Entry criteria شروط الجاهزية للبدء (بيئة، كود مبني، بيانات)، بينما Exit criteria شروط الاكتمال قبل الإغلاق.",
             qEn = "Which of the following is an example of an ENTRY criterion rather than an exit criterion for system testing?",
             correctEn = "Environment, compiled build, and test data are ready",
             wrongEn = listOf(
-                "All critical requirements reach 100% test coverage with zero open bugs",
-                "The final test completion report is reviewed and signed off by leads",
-                "All production-like API response times meet the defined SLA thresholds"
+                "All critical requirements reach 100% test coverage",
+                "Final test completion report is signed off by leads",
+                "All production API response times meet SLA targets"
             ),
             expEn = "Entry criteria specify preconditions to start a test activity (build deployed, environment and data ready); exit criteria define completion thresholds."
         ),
@@ -312,7 +312,7 @@ internal object QuestionsCh5To6 {
             id = "q116", ch = 5,
             q = "لاحظ مدير الاختبار عبر المقاييس تأخر تنفيذ اختبارات الدفع، فقرر إعادة توزيع اثنين من المختبرين للتركيز على وحدة الدفع وتحديث جدول التنفيذ. أي نشاط يمارسه هنا؟",
             correct = "Test control (إجراء تصحيحي للمسار)",
-            wrong = listOf("Static informal document review", "Detailed test case design", "Final test completion reporting"),
+            wrong = listOf("Static informal document review", "Detailed test case design activity", "Final test completion reporting"),
             exp = "رصد التأخير هو Test monitoring، أما اتخاذ قرارات وإجراءات تصحيحية (إعادة توزيع الموارد/تعديل الأولويات) فهو Test control.",
             qEn = "After metrics reveal test execution falling behind on payment features, a test manager reallocates two testers and reprioritizes the schedule. Which activity is this?",
             correctEn = "Test control",
@@ -323,7 +323,7 @@ internal object QuestionsCh5To6 {
             id = "q117", ch = 5,
             q = "يستخدم الفريق متوسط جهد آخر 3 تكرارات (Sprints) في المشروع الحالي للتنبؤ بجهد الاختبار للتكرار القادم. أي تقنية تقدير هذه؟",
             correct = "Extrapolation (الاستقراء)",
-            wrong = listOf("Wideband Delphi expert round", "Three-point PERT formula", "Error guessing estimation"),
+            wrong = listOf("Wideband Delphi (دلفي)", "Three-point PERT formula", "Error guessing estimation"),
             exp = "القسم 5.1.4: Extrapolation يستند إلى قياسات سابقة مبكرة ضمن المشروع نفسه للتنبؤ بالمتبقي، بينما Estimation based on ratios يعتمد نسب مشاريع سابقة.",
             qEn = "An Agile team uses velocity and effort metrics measured from the first three sprints of the current project to forecast testing effort for Sprint 4. Which estimation technique is this?",
             correctEn = "Extrapolation",
@@ -333,19 +333,19 @@ internal object QuestionsCh5To6 {
         RawQ(
             id = "q118", ch = 5,
             q = "ما المعلومات التي ينبغي تضمينها في Test Completion Report عند تسليم الإصدار وفق CTFL v4.0؟",
-            correct = "النتائج والانحرافات والعيوب والمخاطر المتبقية",
+            correct = "ملخص النتائج والانحرافات والعيوب والمخاطر المتبقية",
             wrong = listOf(
-                "خطوات إعادة التشغيل المفصلة لكل حالة اختبار فردية وبيانات الاختبار الخام",
-                "الشيفرة المصدرية الكاملة لكل وحدة برمجية أُصلحت أثناء المشروع",
-                "قائمة برواتب الفريق وتقييمات الأداء السنوية للمطورين والمختبرين"
+                "خطوات إعادة التشغيل المفصلة وبيانات الاختبار الخام",
+                "الشيفرة المصدرية الكاملة لكل وحدة أُصلحت بالإصدار",
+                "تقييمات الأداء السنوية ورواتب المطورين والمختبرين"
             ),
             exp = "القسم 5.3.2: تقرير الإنجاز يلخص ما تم إنجازه والانحرافات والمقاييس والعيوب المتبقية والمخاطر القائمة والدروس المستفادة.",
             qEn = "Which set of items should typically be included in a Test Completion Report according to CTFL v4.0?",
             correctEn = "Summary, plan deviations, open defects, residual risks",
             wrongEn = listOf(
-                "Full step-by-step procedures and raw database dumps for every test case",
-                "Complete source code listings of all bug fixes merged during release",
-                "Individual HR performance appraisals and salary data for team members"
+                "Step-by-step procedures and raw database test dumps",
+                "Complete source code listings of all bug fixes merged",
+                "Individual HR appraisals and salary data for team"
             ),
             expEn = "Section 5.3.2 specifies that completion reports summarize test results, plan deviations, quality metrics, open/residual risks, and lessons learned."
         ),
@@ -356,17 +356,17 @@ internal object QuestionsCh5To6 {
             q = "أي مما يلي يُعد من فوائد أتمتة الاختبار في منهج CTFL v4.0؟",
             correct = "تسريع المهام المتكررة بدقة واتساق أعلى",
             wrong = listOf(
-                "إلغاء الحاجة إلى تصميم حالات اختبار أو فهم المتطلبات الهندسية تماماً",
-                "ضمان خلو البرنامج بنسبة 100% من العيوب دون اختبار استكشافي",
-                "إزالة أي تكلفة لصيانة السكربتات عند تغيير واجهات النظام المستمر"
+                "إلغاء الحاجة لتصميم الاختبارات أو فهم المتطلبات",
+                "ضمان خلو النظام تماماً من العيوب دون استكشاف",
+                "إزالة تكلفة صيانة السكربتات عند تغيّر الواجهات"
             ),
             exp = "الأتمتة تسرّع المهام المتكررة وتزيل الأخطاء البشرية في التحقق المتكرر، لكنها تحتاج صيانة وتخطيطاً.",
             qEn = "Which of the following is a recognized benefit of test automation in CTFL v4.0?",
             correctEn = "Faster, consistent execution of repetitive tests",
             wrongEn = listOf(
-                "Eliminating the need for test analysis, design, and domain knowledge",
-                "Guaranteeing zero defects in production without exploratory testing",
-                "Removing all maintenance effort whenever application UIs or APIs evolve"
+                "Removing the need for test design or domain insight",
+                "Guaranteeing zero defects without exploratory runs",
+                "Eliminating script maintenance as UI or APIs change"
             ),
             expEn = "Section 6.2 notes automation saves repetitive effort, increases execution consistency and speed, and supports earlier/faster feedback."
         ),
@@ -375,17 +375,17 @@ internal object QuestionsCh5To6 {
             q = "أي مما يلي يُعد مخاطرة معروفة (Risk) عند اعتماد أدوات أتمتة الاختبار؟",
             correct = "توقعات مبالغ فيها وإغفال تكلفة الصيانة",
             wrong = listOf(
-                "زيادة سرعة تنفيذ اختبارات الانحدار في خطوط التكامل المستمر CI/CD",
-                "تقليل أخطاء النسخ البشري أثناء فحص مخرجات البيانات الضخمة",
-                "إمكانية إعادة تشغيل نفس التحقق الآلي ليلاً على عدة متصفحات"
+                "تسريع فحوصات الانحدار في خطوط التكامل المستمر",
+                "تقليل أخطاء النسخ عند فحص المخرجات الضخمة",
+                "إعادة تشغيل نفس التحقق ليلاً على عدة متصفحات"
             ),
             exp = "المخاطر تشمل توقعات مبالغاً فيها، التقليل من تكلفة الصيانة، إهمال الاختبار اليدوي والاستكشافي، والاعتماد المفرط على الأداة.",
             qEn = "Which of the following is a common RISK associated with adopting test automation?",
             correctEn = "Unrealistic expectations and maintenance costs",
             wrongEn = listOf(
-                "Faster feedback cycles when regression suites run inside CI/CD pipelines",
-                "Reduced human clerical error when checking large complex data outputs",
-                "Capability to execute identical checks unattended across browsers"
+                "Faster regression feedback inside CI/CD lines",
+                "Fewer clerical errors checking large data sets",
+                "Running identical checks across many browsers"
             ),
             expEn = "Section 6.2 highlights unrealistic expectations, underestimated time/cost to maintain testware, over-reliance on tools, and vendor risk."
         ),
@@ -404,11 +404,11 @@ internal object QuestionsCh5To6 {
             id = "q057", ch = 6,
             q = "أداة SonarQube التي تفحص الكود لاكتشاف الـ bugs المحتملة وانتهاك المعايير دون تشغيله تصنَّف ضمن:",
             correct = "Static testing tools",
-            wrong = listOf("Dynamic performance tools", "Test management dashboards", "Deployment container tools"),
+            wrong = listOf("Dynamic load test tools", "Test management suites", "Deployment container tools"),
             exp = "SonarQube تجري تحليلاً ساكناً للشيفرة دون تنفيذها، لذلك هي أداة Static testing.",
             qEn = "An automated analyzer such as SonarQube that inspects source code for potential defects and standard violations without executing it falls into which category?",
             correctEn = "Static testing tools",
-            wrongEn = listOf("Non-functional load testing tools", "Test management dashboards", "Scalability and deployment standardization tools"),
+            wrongEn = listOf("Dynamic load testing tools", "Test management suites", "Deployment container tools"),
             expEn = "Static testing tools assist reviews and perform static code/data-flow analysis without running the software."
         ),
         RawQ(
@@ -416,17 +416,17 @@ internal object QuestionsCh5To6 {
             q = "في بيئة DevOps مع CI/CD، ما الدور الأهم الذي تؤديه أدوات أتمتة الاختبار وتنسيق البناء (مثل GitHub Actions وJenkins)؟",
             correct = "تشغيل الاختبارات مع كل commit لتسريع التغذية الراجعة",
             wrong = listOf(
-                "إلغاء دور المختبر البشري تماماً واستبداله بشبكة تقارير صماء لا تراقَب",
-                "تخزين بيانات المستخدمين الإنتاجية دون تشفير في مستودع الشيفرة",
-                "منع كتابة أي اختبارات وحدة سريعة لصالح الفحص اليدوي فقط في الإنتاج"
+                "إلغاء دور المختبر البشري واستبداله بتقارير صماء",
+                "تخزين بيانات المستخدمين دون تشفير في المستودع",
+                "منع كتابة اختبارات الوحدة لصالح الفحص الإنتاجي"
             ),
             exp = "في DevOps (2.1.4 & 6.1)، تدعم أدوات DevOps والأتمتة تشغيل التحققات الآلية في كل دفعة لضمان سرعة الجودة.",
             qEn = "In a DevOps CI/CD pipeline, what key value do DevOps and automated test execution tools (e.g., Jenkins, GitHub Actions) provide?",
             correctEn = "Automated tests per commit for rapid feedback",
             wrongEn = listOf(
-                "Replacing human testers completely so exploratory testing vanishes",
-                "Storing unencrypted live customer credentials directly inside git",
-                "Blocking fast unit tests in favor of purely manual release runs"
+                "Replacing human testers so exploratory runs stop",
+                "Storing unencrypted user secrets inside git repos",
+                "Blocking unit tests in favor of live manual runs"
             ),
             expEn = "DevOps infrastructure tools automate build, deployment, and regression checks per commit, accelerating reliable feedback."
         ),
@@ -435,17 +435,17 @@ internal object QuestionsCh5To6 {
             q = "أنشأ الفريق 500 اختبار UI آلي هشة، ومع كل تغيير طفيف في التصميم يتعطل نصفها وتُستنفد ساعات الأسبوع في إصلاح محددات DOM. أي مخاطرة أتمتة تجسّدت هنا؟",
             correct = "التقليل من تكلفة صيانة السكربتات الآلية",
             wrong = listOf(
-                "نقص دعم المعايير الدولية لترجمة واجهة المستخدم متعددة اللغات",
-                "ارتفاع فائض وقت الفريق بحيث لم يجد المبرمجون مهام جديدة لإنجازها",
-                "اختفاء جميع عيوب الأداء في قاعدة البيانات الإنتاجية بالكامل"
+                "نقص دعم المعايير الدولية لترجمة الواجهات",
+                "زيادة فائض الوقت لدى فريق التطوير بالمشروع",
+                "اختفاء جميع عيوب الأداء من قاعدة البيانات"
             ),
             exp = "أكبر مخاطر أتمتة واجهات المستخدم المفرطة إغفال تكلفة الصيانة الدورية عند تغيّر الـ UI (Test pyramid يعالج ذلك).",
             qEn = "A team builds 500 brittle UI tests. After minor layout updates, half fail due to changed DOM locators and engineers spend days fixing scripts. Which automation risk materialized?",
             correctEn = "Underestimating ongoing testware maintenance cost",
             wrongEn = listOf(
-                "Insufficient multi-language localization support in static analyzers",
-                "Elimination of all performance bottlenecks in production databases",
-                "Excess developer free time resulting from over-simplified work"
+                "Weak multi-language support inside static tools",
+                "Zeroing out every performance issue in production",
+                "Excess free time caused by overly simple tasks"
             ),
             expEn = "Section 6.2 warns that teams frequently underestimate testware maintenance costs, especially for fragile UI-level automation."
         ),
@@ -454,17 +454,17 @@ internal object QuestionsCh5To6 {
             q = "يحتاج الفريق لمحاكاة 5,000 مستخدم متزامن لقياس زمن الاستجابة واختناق الذاكرة في الخادم. أي فئة أدوات هي الأنسب؟",
             correct = "Non-functional testing tools (أدوات الأداء والحمل)",
             wrong = listOf(
-                "Static analysis linters لفحص الأسلوب البرمجي مثل SonarQube",
-                "Defect tracking boards لإدارة تذاكر المهام مثل Jira فقط",
+                "Static analysis linters لفحص الشيفرة مثل SonarQube",
+                "Defect tracking boards لإدارة التذاكر مثل Jira فقط",
                 "User story card templates الورقية والرقمية البسيطة"
             ),
             exp = "أدوات الأداء تقيس مقاييس يستحيل اختبارها يدوياً مثل الأحمال الضخمة والتزامن والاستقرار تحت الضغط.",
             qEn = "A team must simulate 5,000 concurrent users to measure server latency and memory bottlenecks. Which tool category is MOST appropriate?",
             correctEn = "Non-functional performance tools",
             wrongEn = listOf(
-                "Static code quality and style linters",
-                "Defect and workflow tracking boards alone",
-                "Manual test case checklist spreadsheets"
+                "Static style and code linters",
+                "Defect workflow tracking boards",
+                "Manual checklist spreadsheets"
             ),
             expEn = "Non-functional performance tools generate heavy concurrent workloads and collect latency/resource metrics infeasible to gather manually."
         ),
@@ -473,17 +473,17 @@ internal object QuestionsCh5To6 {
             q = "في تصنيف أدوات الاختبار وفق منهج CTFL v4.0 (القسم 6.1)، أي فئة تشمل الآلات الافتراضية (VMs) والحاويات (Containers) لضمان بيئات اختبار متطابقة؟",
             correct = "Scalability and deployment standardization",
             wrong = listOf(
-                "Static testing tools (أدوات الاختبار الساكن للشيفرة)",
-                "Test design and data generation tools (أدوات التصميم)",
-                "Collaboration and communication tools (أدوات التواصل)"
+                "Static testing and code review tools",
+                "Test design and data generation tools",
+                "Collaboration and communication tools"
             ),
             exp = "القسم 6.1 في CTFL v4.0 يذكر فئة Scalability and deployment standardization (مثل Virtual machines والحاويات Containers) لتوفير بيئات معزولة وقابلة للتكرار.",
             qEn = "In CTFL v4.0 Section 6.1, which tool category explicitly covers virtual machines (VMs) and containers used to provide consistent, repeatable test environments?",
             correctEn = "Scalability and deployment tools",
             wrongEn = listOf(
-                "Static testing and code review suites",
-                "Test design and synthetic data generation tools",
-                "Team collaboration and messaging applications"
+                "Static testing and review tools",
+                "Test design and data generation",
+                "Collaboration and chat toolsets"
             ),
             expEn = "CTFL v4.0 Section 6.1 includes 'Scalability and deployment standardization' (e.g., virtual machines, containerization tools) to standardize environments."
         ),
@@ -492,17 +492,17 @@ internal object QuestionsCh5To6 {
             q = "اعتمد الفريق على أداة أتمتة مفتوحة المصدر غير مدعومة، ثم توقف مطوروها عن تحديثها مع إصدارات المتصفحات الجديدة وتعذّر ترحيل السكربتات بسهولة. أي مخاطرة في القسم 6.2 تجسّدت؟",
             correct = "مخاطر المورد/الأداة (التوقف أو صعوبة الترحيل)",
             wrong = listOf(
-                "تحقيق تغطية كاملة لفروع الكود دون صيانة مستمرة",
-                "زيادة تفاعل الفريق البشري في جلسات الاختبار الاستكشافي",
-                "تسريع مراجعات المتطلبات الساكنة المبكرة في الفريق"
+                "تغطية كاملة لفروع الكود دون أي صيانة دورية",
+                "زيادة تفاعل الفريق في جلسات الاختبار الاستكشافي",
+                "تسريع مراجعات المتطلبات الساكنة في بداية المشروع"
             ),
             exp = "القسم 6.2 يدرج مخاطر استمرارية المورد أو المشروع مفتوح المصدر (التوقف، غياب التحديثات الأمنية، وصعوبة الترحيل Vendor lock-in).",
             qEn = "A team adopted an unmaintained open-source automation tool that later stopped receiving browser compatibility updates, locking in their test scripts. Which CTFL v4.0 Section 6.2 risk occurred?",
             correctEn = "Tool/vendor lock-in or discontinuation risk",
             wrongEn = listOf(
-                "Achieving 100% branch coverage without needing maintenance",
-                "Increased human creativity during exploratory test sessions",
-                "Faster static reviews of natural-language specifications"
+                "Full branch coverage without any maintenance",
+                "Higher human creativity in exploratory testing",
+                "Faster static reviews of written requirements"
             ),
             expEn = "Section 6.2 highlights tool dependency risks, including vendor shutdown, open-source project abandonment, missing updates, and vendor lock-in."
         ),
@@ -511,17 +511,17 @@ internal object QuestionsCh5To6 {
             q = "بعد نجاح أتمتة فحوصات النظام الرئيسية، أوقف الفريق جلسات الاختبار الاستكشافي البشري ظناً أن الأداة تكشف كل العيوب الممكنة، فتسرّبت مشاكل تجربة مستخدم حرجة للإنتاج. أي مخاطرة وقعت؟",
             correct = "الاعتماد المفرط على الأداة وإهمال الاختبار البشري",
             wrong = listOf(
-                "عدم كفاية سرعة خطوط التشغيل الآلي المستمر CI/CD في الخادم",
-                "استخدام حاويات Containers لتوحيد بيئات التشغيل المتطابقة",
-                "صغر حجم اختبارات الوحدة في قاعدة هرم الاختبار القياسي"
+                "انخفاض سرعة خطوط التشغيل الآلي المستمر في الخادم",
+                "استخدام حاويات Containers لتوحيد بيئات الاختبار",
+                "كثرة اختبارات الوحدة في قاعدة هرم الاختبار القياسي"
             ),
             exp = "الأتمتة تتحقق مما برمجناه لفحصه فقط (Oracle problem)، لكنها لا تعوض التفكير النقدي والإبداع البشري في الاختبار الاستكشافي.",
             qEn = "Assuming their automated suite catches everything, a team stops human exploratory testing and subsequently misses major usability flaws in production. Which automation risk does this show?",
             correctEn = "Over-reliance on tools over human testing",
             wrongEn = listOf(
-                "Slow continuous integration execution speeds across tests",
-                "Using standardized container images to mirror staging setups",
-                "Building too many fast component tests at the pyramid base"
+                "Slow continuous integration build execution",
+                "Using containers to standardize test setups",
+                "Having too many unit tests at pyramid base"
             ),
             expEn = "Section 6.2 warns against over-relying on automation; tools only check scripted expectations and cannot replace human observation and critical thinking."
         )

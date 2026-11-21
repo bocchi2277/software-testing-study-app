@@ -6,15 +6,15 @@ internal object QuestionsCh4 {
         RawQ(
             id = "q025", ch = 4,
             q = "ما الفئات الثلاث لتقنيات الاختبار في منهج CTFL v4.0؟",
-            correct = "Black-box و White-box و Experience-based",
-            wrong = listOf("Static testing و Dynamic testing و Regression suite", "Functional testing و Performance و Security audit", "Unit testing و System integration و Acceptance"),
+            correct = "Black-box و White-box و Experience-based test techniques",
+            wrong = listOf("Static و Dynamic و Regression", "Functional و Performance و Security audit", "Unit testing و System integration و UAT"),
             exp = "Black-box مبنية على المواصفات، وWhite-box على البنية الداخلية، وExperience-based على الخبرة.",
             qEn = "Which three categories of test techniques are defined in the ISTQB CTFL v4.0 syllabus?",
-            correctEn = "Black-box, white-box, and experience-based",
+            correctEn = "Black-box, white-box, and experience-based test techniques",
             wrongEn = listOf(
-                "Static, dynamic, and automated regression test suites",
-                "Functional, performance, and security test techniques",
-                "Component, system, and user acceptance test levels"
+                "Static, dynamic, and regression",
+                "Functional, performance, and security",
+                "Component, system, and acceptance levels"
             ),
             expEn = "Section 4.1 classifies test techniques into black-box (specification-based), white-box (structure-based), and experience-based."
         ),
@@ -65,19 +65,19 @@ internal object QuestionsCh4 {
         RawQ(
             id = "q030", ch = 4,
             q = "ما الفائدة الأساسية من استخدام Decision Table Testing في تحليل المتطلبات؟",
-            correct = "كشف التركيبات المنسية أو المتناقضة بين الشروط",
+            correct = "كشف التركيبات المنسية أو المتناقضة عندما تتفاعل عدة شروط",
             wrong = listOf(
-                "قياس استهلاك الذاكرة أثناء تشغيل الشيفرة تحت ضغط عالٍ ومتواصل",
-                "حساب النسبة المئوية للأسطر البرمجية المنفذة داخل وحدة برمجية",
-                "إيجاد الأخطاء الإملائية والتنسيقية داخل واجهة المستخدم فقط"
+                "قياس استهلاك الذاكرة تحت الضغط",
+                "حساب نسبة تغطية الأسطر البرمجية",
+                "إيجاد الأخطاء الإملائية في الواجهة"
             ),
             exp = "جداول القرار تضمن ألا تفوتنا أي تركيبة شروط وتكشف الفجوات أو التناقض في قواعد العمل.",
             qEn = "What is a primary benefit of using Decision Table Testing during requirements and test analysis?",
-            correctEn = "Identifying missing or contradictory condition combinations",
+            correctEn = "Identifying overlooked or contradictory combinations of conditions",
             wrongEn = listOf(
-                "Measuring runtime memory consumption under peak concurrent user load",
-                "Calculating the percentage of executable code lines run within a module",
-                "Detecting cosmetic typos and alignment issues in graphical layouts"
+                "Measuring runtime memory consumption",
+                "Calculating executed line coverage",
+                "Detecting layout typos in the UI"
             ),
             expEn = "Decision tables systematically map combinations of conditions to actions, revealing gaps or contradictions in specifications."
         ),
@@ -97,7 +97,7 @@ internal object QuestionsCh4 {
             q = "ما الميزة التي يضيفها State Table مقارنة بـ State Transition Diagram؟",
             correct = "إظهار الانتقالات غير الصالحة لكل ثنائية (حالة، حدث)",
             wrong = listOf(
-                "حذف الحالات النهائية لتبسيط التصميم للعميل غير التقني في العرض",
+                "حذف الحالات النهائية من التصميم",
                 "حساب التغطية البرمجية للفروع داخل الكود المصدري تلقائياً بالكامل",
                 "تجاهل الأحداث التي لا تغير الحالة وإهمال شروط الحماية المرفقة"
             ),
@@ -105,7 +105,7 @@ internal object QuestionsCh4 {
             qEn = "What advantage does a state table offer compared to a state transition diagram?",
             correctEn = "It exposes invalid transitions for each (state, event) pair",
             wrongEn = listOf(
-                "It omits terminal states to keep the model minimal for business demos",
+                "It omits terminal states in demos",
                 "It automatically measures white-box branch coverage of source code",
                 "It ignores events that keep the system inside the exact same state"
             ),
@@ -114,19 +114,19 @@ internal object QuestionsCh4 {
         RawQ(
             id = "q033", ch = 4,
             q = "ما العلاقة الصحيحة بين Statement coverage وBranch coverage في CTFL v4.0؟",
-            correct = "100% Branch تعني 100% Statement، والعكس غير صحيح",
+            correct = "100% Branch coverage تعني 100% Statement coverage، والعكس غير صحيح",
             wrong = listOf(
-                "100% Statement coverage تعني دائماً 100% Branch coverage في كل الحالات",
-                "التغطيتان متكافئتان تماماً وتنتجان نفس عدد حالات الاختبار دائماً",
-                "Statement coverage أقوى من Branch لأنها تفحص الأوامر الشرطية فقط"
+                "100% Statement تعني دائماً 100% Branch",
+                "التغطيتان متكافئتان وتنتجان نفس الحالات",
+                "Statement أقوى من Branch في الحلقات"
             ),
             exp = "تحقيق كل الفروع (True/False) يزور كل الأوامر القابلة للتنفيذ، لذا Branch أقوى من Statement.",
             qEn = "What is the relationship between statement coverage and branch coverage?",
-            correctEn = "100% branch guarantees 100% statement, not vice versa",
+            correctEn = "100% branch coverage guarantees 100% statement coverage, not vice versa",
             wrongEn = listOf(
-                "100% statement coverage always guarantees 100% branch coverage",
-                "Both criteria are equivalent and require identical test suites",
-                "Statement coverage subsumes branch coverage in code with loops"
+                "100% statement guarantees branch coverage",
+                "Both require identical test suites",
+                "Statement subsumes branch in loops"
             ),
             expEn = "Exercising every branch (True and False outcomes) reaches every reachable executable statement; the reverse fails for empty else-branches."
         ),
@@ -146,7 +146,7 @@ internal object QuestionsCh4 {
             q = "متى تبقى عيوب خطيرة حتى لو حققت مجموعة الاختبارات 100% Statement و100% Branch coverage؟",
             correct = "عند وجود متطلب مفقود لم يُكتب له كود أصلاً",
             wrong = listOf(
-                "عندما يحتوي الكود على متغير محلي غير مستخدم داخل دالة مغلقة",
+                "وجود متغير محلي غير مستخدم",
                 "عندما تُختبر الفروع الشرطية True و False لكل جملة if في الدالة",
                 "عندما يكون كل سطر قابل للتنفيذ قد نُفذ مرتين أثناء اختبار الوحدة"
             ),
@@ -154,7 +154,7 @@ internal object QuestionsCh4 {
             qEn = "Why can severe defects still exist in software even after achieving 100% statement and 100% branch coverage?",
             correctEn = "Coverage cannot reveal missing requirements never coded",
             wrongEn = listOf(
-                "Because branch coverage skips conditional statements inside loops",
+                "Branch coverage skips loop statements",
                 "Because achieving 100% branch coverage leaves statements unvisited",
                 "Because code coverage tools require live production user traffic"
             ),
@@ -163,19 +163,19 @@ internal object QuestionsCh4 {
         RawQ(
             id = "q036", ch = 4,
             q = "تقنية Error guessing تعتمد أساساً على:",
-            correct = "استباق أخطاء المطور بناءً على الخبرة وFault attacks",
+            correct = "استباق أخطاء المطور بناءً على الخبرة وقوائم Fault attacks السابقة",
             wrong = listOf(
-                "توليد قيم عشوائية متصلة دون أي معرفة بالمجال أو الأعطال الشائعة",
-                "تحليل مخطط انتقال الحالات لإيجاد كل الانتقالات الصالحة وغير الصالحة",
-                "قياس نسبة الفروع التنفيذية المغطاة داخل الشيفرة المصدرية للنظام"
+                "توليد قيم عشوائية دون معرفة بالمجال",
+                "تحليل جدول حالات لإيجاد الانتقالات",
+                "قياس نسبة الفروع التنفيذية في الكود"
             ),
             exp = "Error guessing تقنية خبرة منظَّمة عبر Fault attacks لاستهداف نقاط الضعف المعتادة (مثل القسمة على صفر).",
             qEn = "What does the experience-based technique 'error guessing' primarily rely on?",
-            correctEn = "Tester experience, defect history, and fault attacks",
+            correctEn = "Anticipating developer mistakes from experience and fault attacks",
             wrongEn = listOf(
-                "Generating purely random strings without any domain knowledge",
-                "Constructing a formal state table for valid and invalid transitions",
-                "Measuring the percentage of code branches run during component tests"
+                "Generating random strings without context",
+                "Building a formal state transition matrix",
+                "Measuring executed branch coverage in code"
             ),
             expEn = "Error guessing anticipates errors, defects, and failures based on experience and can be structured via fault attack lists."
         ),
@@ -184,7 +184,7 @@ internal object QuestionsCh4 {
             q = "أي وصف ينطبق بأدق صورة على Exploratory testing؟",
             correct = "تصميم وتنفيذ وتقييم متزامن أثناء التعلّم عبر Sessions",
             wrong = listOf(
-                "تنفيذ نصوص اختبار مكتوبة مسبقاً كلمة بكلمة دون السماح بأي انحراف",
+                "تنفيذ نصوص اختبار مكتوبة دون انحراف",
                 "تشغيل أدوات التحليل الساكن على الشيفرة قبل كتابة حالات الاختبار",
                 "قياس أداء الخادم بتوليد آلاف الطلبات المتزامنة عبر أداة أتمتة"
             ),
@@ -192,7 +192,7 @@ internal object QuestionsCh4 {
             qEn = "Which statement BEST describes exploratory testing?",
             correctEn = "Simultaneous test design, execution, and learning",
             wrongEn = listOf(
-                "Pre-written step-by-step scripts are executed strictly without change",
+                "Running scripted steps without change",
                 "Automated static analyzers inspect source code before compilation",
                 "Automated load generators simulate thousands of concurrent requests"
             ),
@@ -203,7 +203,7 @@ internal object QuestionsCh4 {
             q = "متى يكون Checklist-based testing أكثر فاعلية؟",
             correct = "عند تحديث القائمة دورياً مع إبقائها مرنة وواضحة",
             wrong = listOf(
-                "عند تحويل كل بند إلى نص اختباري جامد من عشرات الخطوات الإلزامية",
+                "تحويل البنود إلى نص جامد من خطوات",
                 "عند تجميد القائمة لسنوات وعدم تعديلها حتى لو تغيرت معمارية النظام",
                 "عند استخدامها كبديل وحيد يمنع تطبيق BVA وجداول القرار نهائياً"
             ),
@@ -211,7 +211,7 @@ internal object QuestionsCh4 {
             qEn = "When is checklist-based testing MOST effective?",
             correctEn = "High-level flexible lists updated from defect trends",
             wrongEn = listOf(
-                "When every checklist item becomes a rigid 30-step test script",
+                "Rigid 30-step scripts per item",
                 "When checklists remain frozen across major architecture releases",
                 "When used to replace BVA, decision tables, and code reviews"
             ),
@@ -221,29 +221,29 @@ internal object QuestionsCh4 {
             id = "q039", ch = 4,
             q = "ما المكونات الثلاثة لقصة المستخدم (3Cs of a User Story) في CTFL v4.0؟",
             correct = "Card و Conversation و Confirmation",
-            wrong = listOf("Code و Compile و Commit workflow", "Check و Control و Close cycle stages", "Condition و Case و Coverage rules"),
+            wrong = listOf("Code و Compile و Commit", "Check و Control و Close cycle stages", "Condition و Case و Coverage rules"),
             exp = "Card (بطاقة الوصف)، Conversation (النقاش المشترك)، Confirmation (معايير القبول).",
             qEn = "What do the '3 Cs' of a user story stand for?",
             correctEn = "Card, Conversation, Confirmation",
-            wrongEn = listOf("Code, Compile, Commit steps", "Check, Control, Close phases", "Condition, Case, Coverage metrics"),
+            wrongEn = listOf("Code, Compile, Commit", "Check, Control, Close phases", "Condition, Case, Coverage metrics"),
             expEn = "Section 4.5.1: A user story consists of Card (written medium), Conversation (shared understanding), and Confirmation (acceptance criteria)."
         ),
         RawQ(
             id = "q040", ch = 4,
             q = "ما الصيغتان الرئيسيتان لكتابة Acceptance Criteria في منهج CTFL v4.0؟",
-            correct = "Scenario-oriented (GWT) و Rule-oriented",
+            correct = "Scenario-oriented (مثل GWT) و Rule-oriented (قواعد محددة)",
             wrong = listOf(
-                "Statement coverage و Branch coverage القياسيتان",
-                "Alpha testing و Beta testing للنشر التدريجي",
-                "Master test plan و Completion report في التوثيق"
+                "Statement و Branch coverage",
+                "Alpha testing و Beta testing",
+                "Master plan و Completion log"
             ),
             exp = "القسم 4.5.2 يحدد الصيغة السلوكية Scenario-oriented (GWT) والصيغة القائمة على القواعد Rule-oriented.",
             qEn = "Which two main formats are commonly used to document acceptance criteria in CTFL v4.0?",
-            correctEn = "Scenario-oriented and rule-oriented formats",
+            correctEn = "Scenario-oriented (Given/When/Then) and rule-oriented formats",
             wrongEn = listOf(
-                "Statement coverage and branch coverage formats",
-                "Alpha testing and beta testing field protocols",
-                "Master test plan and test completion templates"
+                "Statement and branch coverage",
+                "Alpha and beta field testing",
+                "Master test plan templates"
             ),
             expEn = "CTFL v4.0 Section 4.5.2 describes two common formats: scenario-oriented (Given/When/Then) and rule-oriented (bulleted lists or tables)."
         ),
@@ -252,7 +252,7 @@ internal object QuestionsCh4 {
             q = "في ممارسات ATDD والتطوير الرشيق (القسم 4.5 في CTFL v4.0)، من يشكّلون جلسة Three Amigos؟",
             correct = "ممثل الأعمال والمطور والمختبر",
             wrong = listOf(
-                "مدير المشروع ومسؤول الشبكات ومهندس الأمان",
+                "مدير المشروع ومهندس الأمان",
                 "ثلاثة مختبرين يديرون أدوات الأتمتة في فريق مستقل",
                 "العميل النهائي ومسؤول الدعم الفني ومصمم واجهات UI"
             ),
@@ -260,7 +260,7 @@ internal object QuestionsCh4 {
             qEn = "In collaborative user story refinement and ATDD (CTFL v4.0 Section 4.5), which three roles make up the 'Three Amigos'?",
             correctEn = "Business representative, developer, and tester",
             wrongEn = listOf(
-                "A project manager, network administrator, and security auditor",
+                "Project manager and security auditor",
                 "Three automation engineers inside a separate QA department",
                 "An external end user, helpdesk agent, and graphic UI designer"
             ),
@@ -270,11 +270,11 @@ internal object QuestionsCh4 {
             id = "q070", ch = 4,
             q = "حساب رسوم الشحن: أقل من 50$ رسوم 10$، من 50$ إلى 199$ رسوم 5$، ومن 200$ فأكثر مجاني (القيم السالبة مرفوضة). أي مجموعة تحقق 100% Equivalence Partitioning؟",
             correct = "-5، 25، 120، 250",
-            wrong = listOf("10، 50، 199، 200", "-1، 49، 50، 200", "25، 100، 200"),
+            wrong = listOf("10، 50، 199، 200", "-1، 49، 50، 199", "25، 100، 200"),
             exp = "الأقسام الأربعة: (<0 غير صالح)، (0–49)، (50–199)، (≥200). المجموعة {-5, 25, 120, 250} تغطي الأقسام الأربعة بدقة.",
             qEn = "Shipping fee rules: orders below $50 pay $10, $50–$199 pay $5, $200 or more ship free, and negative amounts are rejected. Which input set achieves 100% EP coverage?",
             correctEn = "-5, 25, 120, 250",
-            wrongEn = listOf("10, 50, 199, 200", "-1, 49, 50, 200", "25, 100, 200"),
+            wrongEn = listOf("10, 50, 199, 200", "-1, 49, 50, 199", "25, 100, 200"),
             expEn = "There are four partitions: invalid (<0), $10 tier (0–49), $5 tier (50–199), and free tier (>=200). {-5, 25, 120, 250} hits every partition once."
         ),
         RawQ(
@@ -312,7 +312,7 @@ internal object QuestionsCh4 {
             q = "عند كتابة حالات اختبار سلبية (Negative tests) لنموذج يحتوي على حقلي «العمر» و«كود الخصم» وفق EP، ما الممارسة الصحيحة لتجنب إخفاء العيوب (Defect masking)؟",
             correct = "اختبار قيمة واحدة غير صالحة في كل حالة مع بقاء البقية صالحة",
             wrong = listOf(
-                "إدخال قيم غير صالحة في جميع الحقول معاً في حالة اختبار واحدة لتوفير الوقت",
+                "تعبئة قيم غير صالحة معاً في كل الحقول",
                 "اختبار الحقول الصالحة فقط وتجاهل الأقسام غير الصالحة في التحليل الوظيفي",
                 "حذف رسائل الخطأ التوضيحية عند فشل أكثر من حقل في الوقت نفسه"
             ),
@@ -320,7 +320,7 @@ internal object QuestionsCh4 {
             qEn = "When designing negative equivalence partition tests for a form with multiple fields (Age and Promo Code), how do you prevent defect masking?",
             correctEn = "Use one invalid partition per test while other inputs stay valid",
             wrongEn = listOf(
-                "Combine invalid values for every field in one test to save execution time",
+                "Combine invalid values across all fields",
                 "Test only valid partitions and omit invalid partitions from test design",
                 "Suppress error messages whenever two fields fail validation together"
             ),
@@ -340,19 +340,19 @@ internal object QuestionsCh4 {
         RawQ(
             id = "q075", ch = 4,
             q = "في جدول قرار كامل من 4 قواعد، لاحظت أن قاعدتين تشتركان في (الشرط1 = T) وتختلفان في (الشرط2 = T/F) لكن النتيجة متطابقة في كلتيهما. ماذا نفعل عند طيّ الجدول (Collapsed table)؟",
-            correct = "دمج القاعدتين بوضع (–) للشرط2 لتصبح 3 قواعد",
+            correct = "ندمج القاعدتين ونضع (–) للشرط2 ليصبح الجدول 3 قواعد",
             wrong = listOf(
-                "حذف الشرط1 ومضاعفة عدد القواعد إلى 8 قواعد لضمان التغطية الكاملة",
-                "ترك الجدول بـ 4 قواعد كما هو وتغيير إحدى النتائج عشوائياً",
-                "حذف كل الحالات التي تكون فيها النتيجة إيجابية لتقليص الاختبار"
+                "نحذف الشرط1 ونضاعف إلى 8 قواعد",
+                "نترك الجدول بـ 4 قواعد كما هو",
+                "نحذف القواعد ذات النتيجة الإيجابية"
             ),
             exp = "عند عدم تأثير الشرط الثاني على النتيجة عند تحقق الشرط الأول، يُرمز له بـ (– Don't care) وتندمج القاعدتان.",
             qEn = "In a 4-rule full decision table, two rules with Condition1=True produce the exact same actions regardless of whether Condition2 is True or False. How is the table collapsed?",
-            correctEn = "Merge them with Condition2 set to '-', leaving 3 rules",
+            correctEn = "Merge both rules with Condition2 set to '-', leaving 3 rules",
             wrongEn = listOf(
-                "Remove Condition1 and double the remaining table to 8 total rules",
-                "Keep all 4 rules unchanged and arbitrarily flip one action cell",
-                "Delete every rule that yields a positive action to minimize tests"
+                "Remove Condition1 and double the table",
+                "Keep all 4 rules and flip one outcome",
+                "Delete every positive-action rule"
             ),
             expEn = "Section 4.2.3: Rules where a condition does not affect the outcome are merged using '-' (don't care), reducing test effort without losing coverage."
         ),
@@ -372,7 +372,7 @@ internal object QuestionsCh4 {
             q = "صراف آلي يحتوي على الانتقال: Idle --(withdraw [balance >= amount] / dispense)--> Dispensing. إذا كان الرصيد 50$ وطلب المستخدم سحب 80$، ماذا يحدث وفق مخطط الحالة؟",
             correct = "يبقى في Idle لأن Guard condition غير متحقق",
             wrong = listOf(
-                "ينتقل فوراً إلى Dispensing ويصرف 50$ تلقائياً دون فحص الشرط المحدد",
+                "ينتقل إلى Dispensing ويصرف 50$",
                 "ينتقل إلى حالة تم تعديلها قسراً ويغلق الجلسة مع صرف المبلغ كاملاً",
                 "يُلغى الحدث وتُسجَّل العملية كـ Paid رغم عدم كفاية الرصيد المتاح"
             ),
@@ -380,7 +380,7 @@ internal object QuestionsCh4 {
             qEn = "An ATM defines the transition: Idle --(withdraw [balance >= amount] / dispense)--> Dispensing. If balance is $50 and the user requests $80, what happens according to the state model?",
             correctEn = "The ATM stays in Idle because the guard condition is false",
             wrongEn = listOf(
-                "It immediately moves to Dispensing and outputs $50 despite the guard",
+                "It transitions and dispenses $50",
                 "It bypasses the guard condition and dispenses $80 before alerting",
                 "It permanently moves into an undefined state while crediting funds"
             ),
@@ -402,7 +402,7 @@ internal object QuestionsCh4 {
             q = "في المقطع: read(x); if (x > 0) { y = x * 2; } print(y); — ما قيمة Statement coverage عند التشغيل بمدخل واحد x = 5؟",
             correct = "100% (بينما Branch coverage = 50% فقط)",
             wrong = listOf(
-                "75% (ولتحقيق 100% يجب تشغيل x = -1 أيضاً)",
+                "75% Statement",
                 "50% (لأن الجملة الشرطية تحتوي على فرعين)",
                 "100% Statement و 100% Branch coverage معاً"
             ),
@@ -410,7 +410,7 @@ internal object QuestionsCh4 {
             qEn = "Given the pseudocode: read(x); if (x > 0) { y = x * 2; } print(y); — what coverage is achieved by a single test case x = 5?",
             correctEn = "100% statement coverage, while branch coverage is only 50%",
             wrongEn = listOf(
-                "75% statement coverage; x = -1 is still needed to reach 100%",
+                "75% statement; x = -1 needed",
                 "50% statement coverage because the if-statement has two branches",
                 "100% statement coverage and 100% branch coverage simultaneously"
             ),
@@ -436,7 +436,7 @@ internal object QuestionsCh4 {
             q = "لماذا قد تفشل مجموعة اختبارات تحقق 100% Statement coverage في الوصول إلى 100% Branch coverage داخل جملة `if (x > 10) log(x);` بدون `else`؟",
             correct = "لأن x = 15 تنفذ كل الأوامر دون أخذ فرع False المخفي",
             wrong = listOf(
-                "لأن جملة log(x) لا تُحتسب ضمن الأوامر التنفيذية في White-box testing",
+                "جملة log(x) لا تُحتسب في التغطية",
                 "لأن جملة if التي لا تحتوي على else لا تملك فرع False إطلاقاً في التنفيذ",
                 "لأن Branch coverage تقيس فقط الحلقات التكرارية وتتجاهل الجمل الشرطية"
             ),
@@ -444,7 +444,7 @@ internal object QuestionsCh4 {
             qEn = "Why can a test suite achieve 100% statement coverage on `if (x > 10) log(x);` (with no `else` block) yet still fail to reach 100% branch coverage?",
             correctEn = "A test with x = 15 runs all lines yet skips the implicit False branch",
             wrongEn = listOf(
-                "Because the log(x) call is ignored when calculating executable statements",
+                "log(x) is excluded from statements",
                 "Because an if-statement without an explicit else block has no False branch",
                 "Because branch coverage measures loops exclusively and excludes conditions"
             ),
@@ -453,15 +453,15 @@ internal object QuestionsCh4 {
         RawQ(
             id = "q082", ch = 4,
             q = "قبل كتابة الكود لميزة قفل الحساب، اجتمع مالك المنتج والمطور والمختبر لصياغة أمثلة قابلة للتنفيذ: «بعد 3 محاولات فاشلة يُغلق الحساب؛ المحاولة الثالثة الناجحة تبقيه مفتوحاً». أي نهج هذا؟",
-            correct = "ATDD (Acceptance Test-Driven Development)",
-            wrong = listOf("Code-driven white-box mutation suite", "Post-release production beta acceptance", "Checklist-only maintenance regression cycle"),
+            correct = "Acceptance Test-Driven Development (ATDD)",
+            wrong = listOf("Mutation unit testing", "Beta field acceptance", "Checklist regression"),
             exp = "تعاون الثلاثي قبل التنفيذ لاشتقاق حالات اختبار مباشرة من معايير القبول يمثل ATDD (القسم 4.5.3).",
             qEn = "Before coding an account-lock feature, the PO, developer, and tester write executable examples: '3 consecutive failed logins lock the account; a valid 3rd login keeps it open.' Which approach is this?",
             correctEn = "Acceptance Test-Driven Development (ATDD)",
             wrongEn = listOf(
-                "Code-driven white-box mutation suite analysis",
-                "Post-release production beta acceptance testing",
-                "Checklist-only maintenance regression execution"
+                "Code mutation testing",
+                "Post-release beta testing",
+                "Checklist regression"
             ),
             expEn = "ATDD is a test-first, collaborative approach where Three Amigos derive acceptance tests from criteria before implementation starts."
         ),
@@ -470,7 +470,7 @@ internal object QuestionsCh4 {
             q = "نجحت كل حالات EP وBVA لنموذج رفع الملفات، لكن المختبر خصص جلسة 45 دقيقة لتجربة رفع ملفات بأسماء طويلة جداً ورؤوس معطوبة فانهار التطبيق. ما الدور الذي لعبه Exploratory testing هنا؟",
             correct = "كشف سيناريوهات غير متوقعة مكملةً للاختبارات الرسمية",
             wrong = listOf(
-                "إثبات أن تقنيات الصندوق الأسود عديمة الفائدة ويجب إلغاؤها من العملية",
+                "إثبات عدم جدوى الصندوق الأسود",
                 "قياس التغطية الدقيقة للأسطر البرمجية في خادم التخزين السحابي",
                 "الالتزام التام بنص اختباري مسبق الخطوات دون أي ارتجال أو تعديل"
             ),
@@ -478,7 +478,7 @@ internal object QuestionsCh4 {
             qEn = "After all formal EP and BVA tests pass on a file uploader, a tester runs a 45-minute session trying corrupted headers and huge filenames, crashing the app. How does exploratory testing add value here?",
             correctEn = "Uncovering unstated edge cases to complement systematic tests",
             wrongEn = listOf(
-                "Proving systematic specification-based techniques are obsolete",
+                "Proving black-box methods fail",
                 "Quantitatively measuring branch coverage inside the storage server",
                 "Enforcing rigid adherence to pre-scripted step-by-step procedures"
             ),
@@ -488,11 +488,11 @@ internal object QuestionsCh4 {
             id = "q084", ch = 4,
             q = "أثناء اختبار نموذج الدفع، بادر المختبر فوراً بتجربة القيمة صفر، أرقام سالبة، رموز خاصة مثل `' OR 1=1`، وتاريخ 29 فبراير استناداً لخبرته بأعطال سابقة. ما اسم هذه التقنية؟",
             correct = "Error guessing (Fault attacks)",
-            wrong = listOf("State transition diagramming model", "Statement coverage white-box analysis", "Collapsed decision tabling technique"),
+            wrong = listOf("State transition model", "Statement coverage white-box analysis", "Collapsed decision tabling technique"),
             exp = "استخدام قوائم الأعطال الشائعة (مثل الصفر والرموز الخاصة والتواريخ الحرجة) لتصميم الاختبارات هو Error guessing / Fault attacks.",
             qEn = "While testing a payment form, a tester immediately tries zero, negative amounts, `' OR 1=1`, and Feb 29 based on prior defect experience. Which technique is this?",
             correctEn = "Error guessing (Fault attack)",
-            wrongEn = listOf("State transition testing", "Statement coverage analysis", "Collapsed decision table testing"),
+            wrongEn = listOf("State transitions", "Statement coverage analysis", "Collapsed decision table testing"),
             expEn = "Error guessing anticipates common coding mistakes; fault attacks formalize it using known defect categories and checklists."
         ),
         RawQ(
@@ -500,7 +500,7 @@ internal object QuestionsCh4 {
             q = "قصة مستخدم تقول: «كمستخدم، أريد بحثاً سريعاً ووضعاً ليلياً وتصدير PDF وتسجيل دخول عبر Google في نفس البطاقة». أي معيار من معايير INVEST تنتهكه القصة بشكل صارخ؟",
             correct = "Small (و Independent)؛ لتكديسها أربع ميزات كبيرة",
             wrong = listOf(
-                "Testable؛ لأن وضع الليل لا يمكن اختبار مظهره البصري نهائياً",
+                "Testable؛ فالوضع الليلي لا يُقاس",
                 "Valuable؛ لأن جميع الميزات المطلوبة لا تفيد أي مستخدم فعلي",
                 "Negotiable؛ لأن قصص المستخدم لا يجوز مناقشتها مع المطورين"
             ),
@@ -508,7 +508,7 @@ internal object QuestionsCh4 {
             qEn = "A user story reads: 'As a user, I want fast search, dark mode, PDF export, and OAuth login in this ticket.' Which INVEST criterion is MOST clearly violated?",
             correctEn = "Small; it bundles four distinct features into one story",
             wrongEn = listOf(
-                "Testable; because dark mode colors can never be verified objectively",
+                "Testable; UI colors cannot be checked",
                 "Valuable; because none of the listed features benefit end users",
                 "Negotiable; because user stories must never be discussed with developers"
             ),
@@ -558,38 +558,38 @@ internal object QuestionsCh4 {
         RawQ(
             id = "q113", ch = 4,
             q = "عند بناء جدول قرار لنظام تأمين، لاحظت أن العمود 3 ينفّذ إجراء «رفض الطلب» و«إصدار خصم» معاً لنفس مجموعة الشروط. ماذا كشف جدول القرار هنا؟",
-            correct = "تناقضاً في قواعد العمل داخل المواصفات",
+            correct = "تناقضاً أو غموضاً في قواعد العمل داخل المواصفات",
             wrong = listOf(
-                "وجود تسرب للذاكرة أثناء تصفح واجهة العميل في المتصفح الحديث",
-                "أن عدد الشروط يجب ألا يتجاوز شرطاً واحداً في أي جدول قرار",
-                "أن اختبار الصندوق الأبيض حقق 100% Statement coverage في الدالة"
+                "تسرباً للذاكرة في واجهة المتصفح",
+                "أن الشروط تقتصر على شرط واحد",
+                "تحقيق 100% Statement coverage"
             ),
             exp = "من أهم مزايا Decision Table Testing كشف التناقضات (Contradictions) والنقص في متطلبات العمل مبكراً.",
             qEn = "While building a decision table for insurance underwriting, column 3 triggers both 'Reject Application' and 'Issue Discount'. What has the decision table helped reveal?",
-            correctEn = "A contradiction in the business specification",
+            correctEn = "A contradiction or ambiguity in the business specification",
             wrongEn = listOf(
-                "A runtime memory leak occurring inside the customer browser UI",
-                "A syntax rule limiting decision tables to a single condition row",
-                "Confirmation that component unit tests reached 100% statement coverage"
+                "A memory leak in the browser UI",
+                "A limit of one condition row",
+                "100% unit statement coverage"
             ),
             expEn = "Decision table analysis frequently exposes omissions, contradictions, and conflicting business rules in specifications."
         ),
         RawQ(
             id = "q114", ch = 4,
             q = "ما الذي يميز صياغة Scenario-oriented (مثل Given/When/Then) لمعايير القبول في قصص المستخدمين؟",
-            correct = "وصف السلوك بسياق مسبق وحدث ونتيجة متوقعة",
+            correct = "وصف السلوك بسياق مسبق وحدث ونتيجة متوقعة بوضوح",
             wrong = listOf(
-                "تحويل معايير القبول إلى قائمة من أرقام الأسطر البرمجية في الكود",
-                "استبدال نقاش الفريق اليومي بوثيقة متطلبات شلالية مغلقة بالكامل",
-                "الاقتصار على قياس أزمنة الاستجابة دون فحص المنطق الوظيفي"
+                "سرد أرقام أسطر الكود للمترجم",
+                "استبدال النقاش بوثيقة شلالية",
+                "قياس زمن الاستجابة فقط"
             ),
             exp = "صيغة Given (السياق الأولي) / When (الإجراء) / Then (النتيجة المتوقعة) تسهّل تحويل المعايير مباشرة إلى اختبارات BDD/ATDD.",
             qEn = "What characterizes the 'scenario-oriented' format (e.g., Given/When/Then) for writing acceptance criteria?",
-            correctEn = "Describing context, trigger action, and expected outcome",
+            correctEn = "Expressing expected behavior via context, trigger, and outcome",
             wrongEn = listOf(
-                "Listing source code line numbers that must pass unit compilation",
-                "Replacing team refinement conversations with a locked waterfall contract",
-                "Focusing strictly on server throughput rather than functional behavior"
+                "Listing code line numbers to compile",
+                "Replacing refinement with a waterfall spec",
+                "Measuring server throughput exclusively"
             ),
             expEn = "Scenario-oriented criteria (Given/When/Then) formalize preconditions, actions, and postconditions, making them easy to automate in ATDD/BDD."
         )

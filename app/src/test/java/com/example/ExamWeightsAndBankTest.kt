@@ -62,19 +62,33 @@ class ExamWeightsAndBankTest {
     }
 
     @Test
-    fun `correct answer is not systematically the longest option in English or Arabic`() {
+    fun `correct answer is not systematically the longest or shortest option in English or Arabic`() {
         val all = QuestionsData.QUESTIONS
         val longestEnIds = all.filter { q ->
             q.optionsEn[0].length > q.optionsEn.drop(1).maxOf { it.length }
         }.map { it.id }
+        val shortestEnIds = all.filter { q ->
+            q.optionsEn[0].length < q.optionsEn.drop(1).minOf { it.length }
+        }.map { it.id }
         val longestArIds = all.filter { q ->
             q.options[0].length > q.options.drop(1).maxOf { it.length }
         }.map { it.id }
+        val shortestArIds = all.filter { q ->
+            q.options[0].length < q.options.drop(1).minOf { it.length }
+        }.map { it.id }
 
-        // Pure chance for 4 options is 25% (30/120). Enforce <= 30% (36/120) in BOTH languages.
+        // Pure chance for 4 options is 25% (30/120). Enforce two-sided [15%..30%] (18..36) in BOTH languages.
+        val balanced = longestEnIds.size in 18..36 &&
+            shortestEnIds.size in 18..36 &&
+            longestArIds.size in 18..36 &&
+            shortestArIds.size in 18..36
+
         assertTrue(
-            "Length bias detected — EN: ${longestEnIds.size}/120 $longestEnIds | AR: ${longestArIds.size}/120 $longestArIds",
-            longestEnIds.size <= 36 && longestArIds.size <= 36
+            "Length bias detected — EN longest: ${longestEnIds.size}/120 $longestEnIds, " +
+                "EN shortest: ${shortestEnIds.size}/120 $shortestEnIds | " +
+                "AR longest: ${longestArIds.size}/120 $longestArIds, " +
+                "AR shortest: ${shortestArIds.size}/120 $shortestArIds",
+            balanced
         )
     }
 
