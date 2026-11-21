@@ -465,7 +465,7 @@ internal object QuestionsCh1To3 {
             q = "ما الهدف الرئيسي من عقد Retrospectives في نهاية كل تكرار (Iteration)؟",
             correct = "تقييم ما نجح وما تعثّر واستخلاص إجراءات لتحسين العملية",
             wrong = listOf(
-                "محاسبة المختبرين على عدد العيوب",
+                "تحديد أولويات العيوب داخل التكرار",
                 "استبدال الوثائق بمحاضر شفوية",
                 "إعادة تنفيذ اختبارات القبول يدوياً"
             ),
@@ -473,7 +473,7 @@ internal object QuestionsCh1To3 {
             qEn = "What is the primary purpose of holding retrospectives at the end of an iteration or project milestone?",
             correctEn = "Evaluating lessons learned to define actionable process improvements",
             wrongEn = listOf(
-                "Blaming testers for defects in the sprint",
+                "Triaging and prioritizing sprint defects",
                 "Replacing artifacts with verbal updates",
                 "Re-running acceptance tests manually"
             ),
@@ -512,7 +512,7 @@ internal object QuestionsCh1To3 {
             ),
             exp = "في النماذج التسلسلية يكون الاختبار الساكن مبكراً والديناميكي متأخراً، أما في التكرارية/الرشيقة فيختبر كل تكرار مبكراً وبوتيرة مستمرة.",
             qEn = "How does a sequential SDLC model (e.g., Waterfall) typically differ from an iterative model in terms of testing?",
-            correctEn = "Dynamic tests run later sequentially vs. each sprint",
+            correctEn = "Sequential runs dynamic tests late vs. each iteration",
             wrongEn = listOf(
                 "Sequential workflows eliminate early static code checks",
                 "Iterative models prohibit running system or UAT cycles",

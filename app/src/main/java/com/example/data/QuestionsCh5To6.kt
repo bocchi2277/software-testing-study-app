@@ -106,17 +106,17 @@ internal object QuestionsCh5To6 {
             q = "ما الفرق بين Severity وPriority في Defect report؟",
             correct = "Severity تقيس الأثر التقني؛ وPriority تحدد إلحاح الإصلاح",
             wrong = listOf(
-                "Severity يحددها فريق المبيعات فقط",
-                "كلاهما مصطلح واحد دائماً",
-                "Priority تصف البيئة التشغيلية"
+                "Severity تحدد جدول الإصلاح أولاً",
+                "كلاهما مقياس واحد للأثر دائماً",
+                "Priority تقيس الضرر التقني للنظام"
             ),
             exp = "مثال كلاسيكي: خطأ إملائي في شعار الصفحة الرئيسية (Severity منخفضة لكن Priority عالية للسمعة التجارية).",
             qEn = "How do 'severity' and 'priority' differ in a defect report?",
             correctEn = "Severity measures technical impact; priority sets fix urgency",
             wrongEn = listOf(
-                "Severity is set by sales teams",
-                "Both hold identical bug values",
-                "Priority names the assigned dev"
+                "Severity schedules the release fix",
+                "Both represent identical bug scores",
+                "Priority measures technical impact"
             ),
             expEn = "Severity assesses technical failure impact; priority dictates fix scheduling based on business value and risk."
         ),
@@ -178,7 +178,7 @@ internal object QuestionsCh5To6 {
             qEn = "Stakeholders consciously decide to live with a low-impact risk without extra testing because the mitigation cost exceeds the potential loss. Which risk response is this?",
             correctEn = "Risk acceptance",
             wrongEn = listOf("Risk mitigation", "Risk transfer", "Risk elimination"),
-            expEn = "CTFL v4.0 Section 5.2.3 lists risk responses including mitigation, acceptance, transfer, and contingency plans."
+            expEn = "CTFL v4.0 Section 5.2.4 lists risk responses including mitigation, acceptance, transfer, and contingency plans."
         ),
         RawQ(
             id = "q052", ch = 5,
