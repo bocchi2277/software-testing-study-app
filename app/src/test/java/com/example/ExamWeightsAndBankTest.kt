@@ -62,6 +62,23 @@ class ExamWeightsAndBankTest {
     }
 
     @Test
+    fun `correct answer is not systematically the longest option in English or Arabic`() {
+        val all = QuestionsData.QUESTIONS
+        val longestEnIds = all.filter { q ->
+            q.optionsEn[0].length > q.optionsEn.drop(1).maxOf { it.length }
+        }.map { it.id }
+        val longestArIds = all.filter { q ->
+            q.options[0].length > q.options.drop(1).maxOf { it.length }
+        }.map { it.id }
+
+        // Pure chance for 4 options is 25% (30/120). Enforce <= 30% (36/120) in BOTH languages.
+        assertTrue(
+            "Length bias detected — EN: ${longestEnIds.size}/120 $longestEnIds | AR: ${longestArIds.size}/120 $longestArIds",
+            longestEnIds.size <= 36 && longestArIds.size <= 36
+        )
+    }
+
+    @Test
     fun `prepare keeps correctIdx aligned with original index 0 after shuffling`() {
         val sample = QuestionsData.QUESTIONS.first()
         repeat(20) {

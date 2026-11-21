@@ -1,24 +1,20 @@
-# التعديلات على النسخة الأصلية
+# سجل التعديلات والمراجعات — مسار QA (Android)
 
-1. src/app/lab/page.tsx: إصلاح محاكي Statement coverage (إضافة السطر 2، فيصل إلى 100%).
-2. src/app/api/action/route.ts: إجراء جديد quiz.attempts (إدراج مجمّع) وإجراء data.import (استيراد داخل transaction مع تنظيف المدخلات). الاستيراد يعكس ترتيب الجلسات والمحاولات والامتحانات قبل الإدراج حتى يبقى الأحدث بأكبر id.
-3. src/lib/store.tsx: recordAttempts و importState.
-4. src/app/practice/page.tsx: تسليم المحاكاة يرسل طلب الإجابات مرة واحدة بدل 40 طلباً.
-5. src/components/BugChecker.tsx + src/app/skills/page.tsx: مدقّق تقرير العيب في قسم تقارير العيوب.
-6. src/app/settings/page.tsx: زر استيراد نسخة JSON.
+يلخّص هذا الملف التطورات الهندسية ومراجعات المحتوى في تطبيق الأندرويد الأصلي (`Kotlin + Jetpack Compose + Firebase`) وفق منهج **ISTQB CTFL v4.0**.
 
-ملاحظة: drizzle.config.json يحتوي رابط قاعدة بيانات ثابتاً (app_db على 127.0.0.1)، عدّله لقاعدتك قبل تشغيل drizzle-kit push.
-
-7. src/data/resources.ts: 13 مصدراً جديداً (ESTB مصر، عينات ISTQB الرسمية، مهارة-تك، مواقع تدريب عملي، نشرات ومجتمعات).
-8. BugChecker: يفضّل سطر Title/العنوان إن وُجد بدل أول سطر.
-
-9. src/data/resources.ts: إصلاح الروابط المعطلة/المدفوعة (testingeducation.org ← bbst.courses، مهارة-تك، ESTB)، حذف `istqb-samples` المكرر، ترقية uitestingplayground إلى https، وإضافة Testing بالعربي وSQA Dojo وISTQB ExpandTesting وBug Magnet وSECC.
-10. src/data/career.ts: تحديث CERTS (CTFL-AT ← CTAL-AT v2.0) وخطوة الحجز b2 لمصر (ESTB/SECC).
-11. src/lib/dates.ts: `timeZone: "UTC"` في dayLabel. src/app/progress/page.tsx: محاذاة علامة 65%. src/app/lab/page.tsx: منع تكرار قيم 2-value BVA. src/app/api/action/route.ts + src/app/settings/page.tsx: تحصين profile عند الاستيراد.
-
-12. مصطلحات ISTQB بالإنجليزية بدل العربية: Defect/Failure/Test case/Static testing/Dynamic testing/Component testing/Acceptance criteria/Coverage/Defect report/stakeholders وغيرها في src/data/*.ts وصفحتي skills وlab وBugChecker؛ وأسماء الفصول والمواضيع صارت بصيغة «العربية (English)». أُزيل سطر العنوان الإنجليزي المكرر من صفحتي المنهج.
-13. README.md: إضافة سياسة المصطلحات وجدولها، وإكمال خطوات التشغيل (قاعدة البيانات، DATABASE_URL، drizzle-kit push، الأوامر).
-
-14. src/data/cards.ts: إصلاح تعريف بطاقة Defect الدائري («defect في work product…» ← «عيب أو خلل في work product…»).
-15. src/data/syllabus.ts: إضافة العنوان الإنجليزي للمواضيع 1.4 و2.1 و4.3 لاتساق المواضيع الـ25؛ وحقل `short` اختياري للفصل 2 ودالة `chapterLabel()` للاسم المختصر في القوائم والجداول.
-16. src/app/cards, certificate, progress, practice: استخدام `chapterLabel()` بدل `c.ar` في القوائم المنسدلة والجداول وأشرطة الدقة، و`max-w-full` على قائمة الفصول في صفحة البطاقات حتى لا تتجاوز عرض الشاشة. صفحتا المنهج تعرضان الاسم الكامل.
+1. **إعادة البناء كتطبيق أندرويد أصلي (`Kotlin + Compose + Material 3`):**
+   * واجهة عربية كاملة (`RTL`) مع مكون `LtrContent` للمصطلحات الإنجليزية والأكواد والأرقام، ودعم تخطيطات الهواتف والأجهزة اللوحية (`WindowSizeClass`) والمظهر الفاتح والداكن.
+   * أيقونة تطبيق تكيفية مخصصة (`Adaptive Launcher Icon`) وخطوط محلية (`IBM Plex Sans Arabic` و`JetBrains Mono`).
+2. **الحساب والمزامنة والنسخ الاحتياطي:**
+   * دمج تسجيل الدخول بحساب Google عبر `CredentialManager` ومزامنة البيانات مع `Cloud Firestore` مع دعم تصدير واستيراد النسخ الاحتياطية بصيغة JSON.
+3. **اللوحة اليومية وPomodoro وRoadmap:**
+   * مكون **خارطة المنهج (Roadmap)** التسلسلية للفصول الستة (25 موضوعاً) مع مؤشرات التقدم والبحث الفوري عبر العناوين والمصطلحات وفخاخ الامتحان.
+   * مؤقت **Pomodoro** مستمر عبر الشاشات مع نقاط XP ومستويات التركيز ورسم بياني لنشاط آخر 7 أيام.
+4. **مراجعة واعتماد بنك الأسئلة وفق CTFL v4.0:**
+   * تصحيح تصنيف جلسة `Three Amigos` (`q053`) إلى القسم `4.5`، وتوحيد مصطلح `Tests wear out` (المبدأ 5)، وإعادة صياغة الأسئلة والمشتتات لتتوافق مع أمثلة ومنهج v4.0 الرسمي.
+   * توسيع البنك من 57 إلى **120 سؤالاً** (`q001..q120`) مع إضافة أسئلة سيناريو وحسابات عملية (`K3`) وتوزيع الفصول (`20 / 16 / 14 / 38 / 22 / 10`) مع سحب 40 سؤالاً في المحاكاة بالأوزان الرسمية (`8 / 6 / 4 / 11 / 9 / 2`).
+   * دعم ثنائي اللغة الكامل (`EN ⇄ عربي`) لكل سؤال وخياراته وتفسيره داخل جلسة التدريب والمحاكاة ومراجعة الأخطاء.
+5. **معالجة الملاحظات الهندسية واختبارات التحقق:**
+   * **حفظ حالة الامتحان والتدريب عند تدوير الشاشة:** استبدال `remember` بـ `rememberSaveable` عبر `PracticeSessionPersistence` للحفاظ على الأسئلة وترتيبها، الإجابات، العلامات، السؤال الحالي، اللغة، والمؤقت الزمني المعتمد على `startAtMs`.
+   * **إزالة تحيّز طول الإجابة الصحيحة:** تقليص طول الإجابات الصحيحة وإثراء المشتتات في العربية والإنجليزية، مع فرض اختبار آلي يمنع تجاوز نسبة كون الإجابة الصحيحة هي الأطول حد 30% في اللغتين، وتضمين صياغة `"None of the listed options"` مع الحفاظ على أمان خلط الخيارات.
+   * **اختبارات الوحدة (JVM):** إضافة اختبارات `LeitnerSchedulerTest` و`ExamWeightsAndBankTest` و`ExamSessionPersistenceTest`.

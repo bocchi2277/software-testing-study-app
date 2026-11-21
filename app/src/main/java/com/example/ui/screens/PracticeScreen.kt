@@ -30,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,12 +51,6 @@ import com.example.ui.theme.LocalQaColors
 import com.example.util.StatsUtils
 import kotlin.math.roundToInt
 
-private sealed interface PracticeView {
-    data object Menu : PracticeView
-    data class PracticeSession(val qs: List<PreparedQuestion>, val title: String, val initialEnglish: Boolean) : PracticeView
-    data class ExamSession(val qs: List<PreparedQuestion>, val minutes: Int, val initialEnglish: Boolean) : PracticeView
-}
-
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun PracticeScreen(
@@ -66,13 +61,15 @@ fun PracticeScreen(
     onBackToMenu: () -> Unit
 ) {
     val qa = LocalQaColors.current
-    var view by remember { mutableStateOf<PracticeView>(PracticeView.Menu) }
-    var chFilter by remember { mutableStateOf(initialCh?.toString() ?: "all") }
-    var qFilter by remember { mutableStateOf("all") }
-    var qCount by remember { mutableIntStateOf(10) }
-    var examMinutes by remember { mutableIntStateOf(60) }
-    var useEnglish by remember { mutableStateOf(false) }
-    var autoLaunched by remember { mutableStateOf(false) }
+    var view by rememberSaveable(stateSaver = PracticeSessionPersistence.PracticeViewSaver) {
+        mutableStateOf<PracticeView>(PracticeView.Menu)
+    }
+    var chFilter by rememberSaveable { mutableStateOf(initialCh?.toString() ?: "all") }
+    var qFilter by rememberSaveable { mutableStateOf("all") }
+    var qCount by rememberSaveable { mutableIntStateOf(10) }
+    var examMinutes by rememberSaveable { mutableIntStateOf(60) }
+    var useEnglish by rememberSaveable { mutableStateOf(false) }
+    var autoLaunched by rememberSaveable { mutableStateOf(false) }
 
     var chMenuExpanded by remember { mutableStateOf(false) }
 

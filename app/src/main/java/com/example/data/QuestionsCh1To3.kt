@@ -7,11 +7,11 @@ internal object QuestionsCh1To3 {
             id = "q001", ch = 1,
             q = "أي مبدأ يقول إن الاختبار الشامل لكل المدخلات والتركيبات مستحيل؟",
             correct = "Exhaustive testing is impossible",
-            wrong = listOf("Defects cluster together", "Absence-of-defects fallacy", "Tests wear out"),
+            wrong = listOf("Defects cluster together principle", "Absence-of-defects fallacy principle", "Tests wear out (Pesticide paradox)"),
             exp = "المبدأ الثاني: لا يمكن اختبار كل التركيبات، لذلك نستخدم المخاطر والأولويات وتقنيات تصميم الاختبار.",
-            qEn = "Which of the following testing principles states that testing all combinations of inputs and preconditions is infeasible?",
+            qEn = "Which testing principle states that testing all combinations of inputs and preconditions is infeasible?",
             correctEn = "Exhaustive testing is impossible",
-            wrongEn = listOf("Defects cluster together", "Absence-of-defects fallacy", "Tests wear out"),
+            wrongEn = listOf("Defects tend to cluster in modules", "The absence-of-defects fallacy rule", "Tests wear out over repeated runs"),
             expEn = "Principle 2: Testing everything is impossible except in trivial cases; instead, risk analysis, prioritization, and test techniques are used."
         ),
         RawQ(
@@ -44,11 +44,11 @@ internal object QuestionsCh1To3 {
             ),
             exp = "Debugging نشاط تطويري لتحليل السبب وإصلاحه، ثم يأتي Confirmation testing للتحقق من الإصلاح.",
             qEn = "Which of the following BEST distinguishes testing from debugging?",
-            correctEn = "Testing reveals failures caused by defects, whereas debugging finds, analyzes, and fixes the root cause in code",
+            correctEn = "Testing reveals runtime failures; debugging locates and fixes the defect",
             wrongEn = listOf(
-                "Testing repairs defects in source code, whereas debugging demonstrates failures to end users",
-                "Debugging executes scripted test cases in the environment, whereas testing modifies the program code",
-                "Both are development activities aimed exclusively at rewriting specifications before design"
+                "Testing repairs defects in source code; debugging demonstrates failures to users",
+                "Debugging executes scripted test cases; testing modifies the program code directly",
+                "Both are development activities aimed exclusively at rewriting specifications"
             ),
             expEn = "Dynamic testing shows failures; debugging is a development activity to locate and fix the defect, followed by confirmation testing."
         ),
@@ -66,19 +66,19 @@ internal object QuestionsCh1To3 {
         RawQ(
             id = "q005", ch = 1,
             q = "في أي من الحالات التالية يقع الفريق في فخ Absence-of-defects fallacy؟",
-            correct = "نظام خالٍ من الـ defects المعروفة لكنه لا يلبي احتياجات المستخدمين الفعلية",
+            correct = "نظام بلا defects معروفة لكنه لا يلبي حاجة المستخدمين",
             wrong = listOf(
                 "نظام تتركز معظم الـ defects المكتشفة فيه داخل وحدة برمجية واحدة عالية التعقيد",
-                "نظام لم تُنفَّذ فيه اختبارات الكود الأبيض رغم تغطية جميع حالات الاستخدام",
-                "نظام تأخر موعد إطلاقه بسبب إعادة تشغيل نفس مجموعة الاختبارات دون تحديث"
+                "نظام لم تُنفَّذ فيه اختبارات الكود الأبيض رغم تغطية جميع حالات الاستخدام المحددة",
+                "نظام تأخر موعد إطلاقه بسبب إعادة تشغيل نفس مجموعة الاختبارات دون أي تحديث"
             ),
             exp = "إصلاح كل الـ defects لا يضمن نجاح النظام إن لم يحقق حاجة المستخدم (Validation).",
             qEn = "Which of the following situations illustrates the 'absence-of-defects fallacy'?",
-            correctEn = "A system is free of known specification defects, yet fails to meet actual user needs and business goals",
+            correctEn = "A defect-free system fails to meet actual user needs",
             wrongEn = listOf(
-                "A system where most discovered defects are concentrated inside one highly complex software module",
-                "A system where white-box coverage was omitted despite full execution of all documented use cases",
-                "A system delayed past release because the same automated test suite was re-run without maintenance"
+                "Most discovered defects cluster inside one complex module",
+                "White-box coverage was omitted despite executing all use cases",
+                "Release slipped after running an unmaintained automation suite"
             ),
             expEn = "Principle 7: Fixing all defects against a flawed specification does not ensure success if the product is unusable or fails validation."
         ),
@@ -104,11 +104,11 @@ internal object QuestionsCh1To3 {
             ),
             exp = "Traceability تدعم تحليل الأثر وتدقيق التغطية وإعداد تقارير الحالة.",
             qEn = "Which of the following is a primary benefit of maintaining traceability between the test basis and test cases?",
-            correctEn = "Supporting impact analysis of changes and evaluating requirement coverage by test cases",
+            correctEn = "Supporting impact analysis and measuring requirement coverage",
             wrongEn = listOf(
-                "Reducing test execution duration by automatically generating synthetic test data",
-                "Eliminating the need for a test plan and completion reports in Agile projects",
-                "Guaranteeing that no unexpected defects will occur in production after release"
+                "Reducing execution time by automatically generating synthetic test data sets",
+                "Eliminating the need for any test plan or completion reports in Agile teams",
+                "Guaranteeing zero unexpected defects can ever occur in live production systems"
             ),
             expEn = "Bidirectional traceability facilitates impact analysis, coverage assessment, audits, and clear status communication."
         ),
@@ -126,19 +126,19 @@ internal object QuestionsCh1To3 {
         RawQ(
             id = "q009", ch = 1,
             q = "ما الميزة الرئيسية لاستقلالية الاختبار (Independence of testing)؟",
-            correct = "تقليل التحيز المعرفي للمؤلف وكشف defects قد يغفل عنها من أنشأ المنتج",
+            correct = "تقليل التحيز المعرفي وكشف عيوب قد يغفل عنها المؤلف",
             wrong = listOf(
-                "ضمان فهم فوري ومشترك للمتطلبات دون الحاجة إلى جلسات توضيح",
-                "خفض تكلفة المشروع الإجمالية وإلغاء الحاجة إلى مراجعات الكود النظيرة",
-                "تسريع إصلاح الأخطاء بنقل مسؤولية الجودة كاملة إلى فريق الاختبار"
+                "ضمان فهم فوري ومشترك للمتطلبات دون الحاجة إلى جلسات توضيح أو مراجعة",
+                "خفض تكلفة المشروع الإجمالية وإلغاء الحاجة إلى مراجعات الكود بين الزملاء",
+                "تسريع إصلاح الأخطاء عبر نقل مسؤولية الجودة كاملة إلى فريق الاختبار"
             ),
             exp = "Independence يقلل التحيز المعرفي، لكنه قد يسبب عزلة أو فجوة تواصل إن لم يُدر جيداً.",
             qEn = "Which of the following is a key advantage of independence in testing?",
-            correctEn = "Independent testers avoid the author's cognitive bias and often uncover different kinds of failures",
+            correctEn = "Avoiding the author's bias to uncover different failure types",
             wrongEn = listOf(
-                "It guarantees immediate shared understanding of requirements without team clarification meetings",
-                "It reduces total project cost and eliminates the need for peer code reviews",
-                "It accelerates defect resolution by transferring full quality ownership exclusively to testers"
+                "Guaranteeing immediate shared understanding without clarification meetings",
+                "Reducing total project cost by eliminating all peer code reviews",
+                "Accelerating defect resolution by transferring quality ownership solely to testers"
             ),
             expEn = "Independent testers bring different assumptions and avoid confirmation bias, though high independence can risk isolation if communication is poor."
         ),
@@ -153,11 +153,11 @@ internal object QuestionsCh1To3 {
             ),
             exp = "QA يمنع الـ defects بتحسين العمليات، والاختبار من أنشطة Quality Control لاكتشاف العيوب في المنتج.",
             qEn = "Which statement MOST accurately describes the relationship between Quality Assurance (QA) and Quality Control (QC)?",
-            correctEn = "QA is a process-oriented, preventive approach, whereas testing is a product-oriented QC activity",
+            correctEn = "QA is process-oriented and preventive; testing is product-oriented QC",
             wrongEn = listOf(
-                "QA is synonymous with dynamic testing, whereas QC is limited to writing quality policies",
-                "QC focuses solely on improving development processes without inspecting or executing products",
-                "QA begins only after customer handover, whereas QC occurs exclusively during early analysis"
+                "QA is synonymous with dynamic testing; QC covers writing quality policy manuals",
+                "QC focuses exclusively on process audits without ever executing software products",
+                "QA begins only after customer release; QC occurs strictly during initial analysis"
             ),
             expEn = "QA focuses on adhering to proper processes to prevent defects; QC comprises product-oriented activities such as testing to detect defects."
         ),
@@ -175,19 +175,19 @@ internal object QuestionsCh1To3 {
         RawQ(
             id = "q059", ch = 1,
             q = "في نموذج Whole-team approach (CTFL v4.0)، ما الدور الأساسي للمختبرين مع الفريق؟",
-            correct = "نقل المعرفة الاختبارية والتعاون مع المطورين والأعمال لضمان جودة شاملة",
+            correct = "نقل المعرفة الاختبارية والتعاون مع الفريق للجودة",
             wrong = listOf(
-                "تحمّل المسؤولية الحصرية عن الجودة ومنع أي مطور من كتابة اختبارات",
+                "تحمّل المسؤولية الحصرية عن الجودة ومنع أي مطور من كتابة اختبارات الوحدة",
                 "العمل في عزلة تامة عن الفريق وعدم حضور اجتماعات التخطيط اليومية",
                 "تأجيل جميع أنشطة الاختبار حتى استلام النظام مكتملاً في نهاية المشروع"
             ),
             exp = "Whole-team approach يجعل الجودة مسؤولية مشتركة حيث يوجّه المختبرون الفريق ويدعمون بناء الاختبارات.",
             qEn = "Under the whole-team approach in CTFL v4.0, what is a key responsibility of testers?",
-            correctEn = "Sharing testing expertise and collaborating with developers and business reps so everyone owns quality",
+            correctEn = "Sharing testing knowledge so everyone owns quality",
             wrongEn = listOf(
-                "Assuming sole responsibility for quality and prohibiting developers from writing tests",
-                "Working in strict isolation and skipping daily planning and refinement sessions",
-                "Postponing all test activities until a fully integrated build is handed over at the end"
+                "Owning quality alone and prohibiting developers from writing tests",
+                "Working in strict isolation and skipping daily refinement sessions",
+                "Postponing all test activities until final integrated delivery"
             ),
             expEn = "In the whole-team approach, quality is a shared team responsibility; testers coach teammates and collaborate on test strategies."
         ),
@@ -205,19 +205,19 @@ internal object QuestionsCh1To3 {
         RawQ(
             id = "q061", ch = 1,
             q = "تغيير عملة الدفع دون تحديث واجهة حساب الضريبة تسبب في فشل الحسابات. أي مهارة اختبارية تساعد المختبر على الربط الفعال مع المطورين لتوضيح هذا الخلل؟",
-            correct = "مهارات التواصل البناء والتفكير النقدي وتقديم تقارير موضوعية",
+            correct = "التواصل البناء والتفكير النقدي والتقارير الموضوعية",
             wrong = listOf(
-                "تجنب التواصل المباشر والاكتفاء بإغلاق النسخة فوراً دون شرح",
-                "حفظ أسماء كل خوارزميات الترتيب دون فهم منطق الأعمال للنظام",
-                "كتابة التقارير بأسلوب هجومي لإجبار المطور على قبول الأولوية"
+                "تجنب التواصل المباشر والاكتفاء بإغلاق النسخة الاختبارية فوراً دون شرح",
+                "حفظ أسماء خوارزميات الترتيب دون فهم منطق الأعمال الخاص بالنظام المالي",
+                "كتابة تقارير العيوب بأسلوب حاد لإجبار المطور على رفع الأولوية مباشرة"
             ),
             exp = "منهج CTFL v4.0 يؤكد أهمية المهارات الشخصية مثل التواصل الموضوعي والتفكير النقدي والفضول.",
             qEn = "Which generic tester skill MOST helps a tester communicate defect findings constructively without creating friction with developers?",
-            correctEn = "Constructive communication, critical thinking, and objective, non-judgmental reporting",
+            correctEn = "Constructive communication and objective reporting",
             wrongEn = listOf(
-                "Avoiding direct dialogue and immediately rejecting builds without documented evidence",
-                "Memorizing sorting algorithms without understanding the application's business domain",
-                "Writing confrontational defect reports to force developers to escalate priority"
+                "Avoiding direct dialogue and rejecting builds without documented evidence",
+                "Memorizing sorting algorithms without understanding the business domain logic",
+                "Writing confrontational defect reports to pressure developers into escalating priority"
             ),
             expEn = "CTFL v4.0 Section 1.5.1 highlights communication skills, critical thinking, curiosity, attention to detail, and domain knowledge."
         ),
@@ -262,38 +262,38 @@ internal object QuestionsCh1To3 {
         RawQ(
             id = "q098", ch = 1,
             q = "أي مثال مما يلي يوضح مبدأ «الاختبار يعتمد على السياق» (Testing is context dependent) بأدق صورة؟",
-            correct = "يُختبر برنامج أجهزة طبية بصرامة توثيق وتغطية أعلى بكثير من موقع ترويجي بسيط",
+            correct = "تطبيق صرامة أكبر للبرامج الطبية مقارنة بموقع ترويجي بسيط",
             wrong = listOf(
-                "تركّزت 80% من عيوب تطبيق بنكي داخل وحدة حساب الفوائد المعقدة",
-                "أدت إعادة تشغيل نفس مجموعة الانحدار دون تحديث إلى تراجع العيوب المكتشفة",
-                "اكتشف الفريق عيباً في التصميم أثناء مراجعة المواصفات قبل كتابة سطر كود"
+                "تركّز 80% من عيوب تطبيق بنكي داخل وحدة حساب الفوائد المصرفية المعقدة",
+                "تراجع فاعلية مجموعة الانحدار عند إعادة تشغيلها باستمرار دون أي تحديث",
+                "اكتشاف عيب تصميمي أثناء مراجعة المواصفات المبكرة قبل بدء البرمجة"
             ),
             exp = "المبدأ السادس: يختلف أسلوب الاختبار وتقنياته ومستوى صرامته باختلاف سياق النظام ومجاله ومخاطره.",
             qEn = "Which of the following examples BEST illustrates the principle 'Testing is context dependent'?",
-            correctEn = "Safety-critical medical software undergoes far stricter coverage and audit rigor than a simple promotional website",
+            correctEn = "Medical devices undergo stricter testing than a simple promo site",
             wrongEn = listOf(
-                "80% of defects in a banking application were clustered inside its complex interest calculation module",
-                "Re-running an unchanged regression suite repeatedly stopped revealing new defects",
-                "A design flaw was detected during an early specification review before coding started"
+                "80% of banking defects clustered inside a single interest module",
+                "Re-running an unchanged regression suite stopped finding new defects",
+                "A design flaw was detected in a requirements review before coding"
             ),
             expEn = "Principle 6: Testing cannot be applied identically everywhere; methodology, rigor, and techniques depend on domain, risk, and SDLC context."
         ),
         RawQ(
             id = "q099", ch = 1,
             q = "أي مما يلي يمكن أن يسبب Failure في نظام برمجي دون أن يكون ناجماً عن Error بشري في كتابة الشيفرة؟",
-            correct = "ظروف بيئية قاسية مثل الإشعاع أو التداخل الكهرومغناطيسي أو هجمات أمنية متعمدة",
+            correct = "الإشعاع أو التداخل الكهرومغناطيسي أو الهجمات المتعمدة",
             wrong = listOf(
-                "تخطي مرحلة كتابة خطة الاختبار في بداية المشروع التطويري",
-                "انخفاض عدد حالات الاختبار المنفذة في بيئة ضمان الجودة",
-                "اختيار مراجع تقني خارجي لمراجعة وثيقة المتطلبات الوظيفية"
+                "تخطي مرحلة إعداد خطة الاختبار الرئيسية في بداية المشروع التطويري",
+                "انخفاض عدد حالات الاختبار المنفذة يومياً في بيئة ضمان الجودة",
+                "تعيين مراجع تقني خارجي لمراجعة وثيقة المتطلبات الوظيفية النهائية"
             ),
             exp = "القسم 1.2.3: قد تنشأ الـ Failures أيضاً عن ظروف بيئية مادية (حرارة، إشعاع، مجالات مغناطيسية) أو أفعال متعمدة دون خطأ برمجي.",
             qEn = "According to CTFL v4.0, which of the following can cause a system failure WITHOUT being triggered by a human coding error?",
-            correctEn = "Environmental conditions such as radiation or electromagnetic fields, or deliberate attacks",
+            correctEn = "Radiation, electromagnetic fields, or deliberate attacks",
             wrongEn = listOf(
                 "Omitting the formal master test plan document at project kickoff",
                 "Executing fewer regression test cases in the staging environment",
-                "Assigning an external technical reviewer to inspect requirements"
+                "Assigning an external technical reviewer to inspect specifications"
             ),
             expEn = "Section 1.2.3 notes that failures can also result from environmental conditions (e.g., radiation, magnetic fields, pollution) or deliberate malicious actions."
         ),
@@ -311,19 +311,19 @@ internal object QuestionsCh1To3 {
         RawQ(
             id = "q101", ch = 1,
             q = "متى قد يكون نهج Whole-team approach أقل ملاءمة أو يحتاج توازناً إضافياً في المؤسسة؟",
-            correct = "في الأنظمة عالية الخطورة أو التنظيمية التي تتطلب استقلالية صارمة لفريق الاختبار",
+            correct = "في الأنظمة عالية الخطورة التي تتطلب استقلالية صارمة",
             wrong = listOf(
-                "في الفرق الرشيقة الصغيرة التي تسعى لتسريع التواصل اليومي",
+                "في الفرق الرشيقة الصغيرة التي تسعى لتسريع التواصل اليومي المستمر",
                 "عندما يشارك المختبرون في صياغة معايير القبول لقصص المستخدمين",
                 "عندما يتعاون المطورون والمختبرون في بناء اختبارات آلية مشتركة"
             ),
             exp = "القسم 1.5.2: رغم مزايا Whole-team، فإن البيئات التنظيمية الحساسة للسلامة قد تتطلب مستوى أعلى من استقلالية الاختبار.",
             qEn = "In which situation might the 'whole-team approach' be less suitable on its own and require higher test independence?",
-            correctEn = "In heavily regulated or safety-critical projects that mandate strict independent test verification",
+            correctEn = "Safety-critical projects mandating strict independent verification",
             wrongEn = listOf(
-                "In small co-located Agile teams aiming to improve daily collaboration",
-                "When testers participate early in refining user story acceptance criteria",
-                "When developers and testers pair together to maintain automated API tests"
+                "Small co-located Agile teams aiming to improve daily collaboration",
+                "Teams where testers help refine user story acceptance criteria early",
+                "Developers and testers pairing together on automated API checks"
             ),
             expEn = "Section 1.5.2 notes that while whole-team dynamics improve collaboration, high-risk or regulated domains often require stronger test independence."
         ),
@@ -333,22 +333,22 @@ internal object QuestionsCh1To3 {
             id = "q011", ch = 2,
             q = "أي مما يلي يُعد مستوى اختبار (Test level)؟",
             correct = "Component integration testing",
-            wrong = listOf("Smoke testing", "Regression testing", "Exploratory testing"),
+            wrong = listOf("Smoke & sanity testing process", "Regression suite execution", "لا شيء من الخيارات المذكورة"),
             exp = "المستويات الخمسة: Component, Component integration, System, System integration, Acceptance.",
             qEn = "Which of the following is classified as a 'test level' in CTFL v4.0?",
             correctEn = "Component integration testing",
-            wrongEn = listOf("Smoke testing", "Regression testing", "Exploratory testing"),
+            wrongEn = listOf("Smoke and sanity testing", "Automated regression suite", "None of the listed options"),
             expEn = "The five test levels are component, component integration, system, system integration, and acceptance testing."
         ),
         RawQ(
             id = "q012", ch = 2,
             q = "بعد إصلاح defect، الاختبار الذي يتأكد أن نفس الحالة لم تعد تفشل هو:",
             correct = "Confirmation testing",
-            wrong = listOf("Regression testing", "Smoke testing", "Load testing"),
+            wrong = listOf("Regression test execution", "Operational smoke testing", "Non-functional load test"),
             exp = "Confirmation (Re-testing) يعيد نفس الحالة الفاشلة. أما Regression فيتحقق من عدم كسر وظائف أخرى.",
             qEn = "After a developer fixes a reported defect, which type of testing verifies that the original failing test case now passes?",
             correctEn = "Confirmation testing",
-            wrongEn = listOf("Regression testing", "Smoke testing", "Load testing"),
+            wrongEn = listOf("Regression suite testing", "Build verification smoke test", "Performance load testing"),
             expEn = "Confirmation testing (re-testing) confirms that a specific defect has been fixed; regression testing checks for unintended side effects elsewhere."
         ),
         RawQ(
@@ -362,11 +362,11 @@ internal object QuestionsCh1To3 {
             ),
             exp = "يتأكد أن التعديل أو الإصلاح لم يكسر ما كان يعمل مسبقاً، وهو مرشح قوي للأتمتة.",
             qEn = "What is the primary objective of regression testing?",
-            correctEn = "Detecting unintended side effects in unchanged parts of the software after a change",
+            correctEn = "Detecting unintended side effects in unchanged areas",
             wrongEn = listOf(
-                "Measuring server response latency under peak concurrent user traffic",
-                "Reviewing requirement specifications for ambiguity before coding begins",
-                "Verifying solely that the single fixed defect no longer fails in isolation"
+                "Measuring server response latency under peak concurrent load",
+                "Reviewing requirement specifications before programming starts",
+                "Verifying solely that one fixed defect no longer fails alone"
             ),
             expEn = "Regression testing confirms that modifications (fixes, features, environment updates) have not broken existing working functionality."
         ),
@@ -406,19 +406,19 @@ internal object QuestionsCh1To3 {
         RawQ(
             id = "q017", ch = 2,
             q = "كيف يساعد Impact analysis في تخطيط Maintenance testing؟",
-            correct = "يحدد أجزاء النظام المتأثرة بالتغيير لتقدير نطاق إعادة الاختبار ومخاطره",
+            correct = "تحديد الأجزاء المتأثرة لتقدير نطاق إعادة الاختبار",
             wrong = listOf(
-                "يحسب سرعة كتابة المطورين للشيفرة الجديدة مقارنة بالإصدار السابق",
-                "يحذف كل حالات الاختبار القديمة تلقائياً ويستبدلها باختبارات يدوية",
-                "يقلص حجم قاعدة البيانات الإنتاجية قبل تنفيذ ترحيل البيانات"
+                "قياس سرعة كتابة المطورين للشيفرة الجديدة مقارنة بالإصدار السابق في المشروع",
+                "حذف جميع حالات الاختبار القديمة تلقائياً واستبدالها بسكربتات يدوية حديثة",
+                "تقليص حجم قاعدة البيانات الإنتاجية الفعلي قبل تنفيذ عملية ترحيل البيانات"
             ),
             exp = "تحليل الأثر يحدد ما يجب إعادة اختباره (regression) بحسب المخاطر وحجم التغيير.",
             qEn = "How does impact analysis assist in planning maintenance testing?",
-            correctEn = "It identifies affected areas of the system to scope regression testing based on risk and change size",
+            correctEn = "Identifying affected components to scope regression testing",
             wrongEn = listOf(
-                "It measures developer coding velocity compared to previous software releases",
-                "It automatically deletes legacy test suites and converts them into manual scripts",
-                "It compresses the live production database prior to executing a data migration"
+                "Measuring developer coding velocity relative to previous releases",
+                "Automatically deleting legacy suites and converting them into manual steps",
+                "Compressing the live production database prior to executing migration"
             ),
             expEn = "Impact analysis evaluates which parts of an existing system may be impacted by a change so regression testing can be accurately scoped."
         ),
@@ -433,49 +433,49 @@ internal object QuestionsCh1To3 {
             ),
             exp = "TDD نهج Test-first على مستوى المكونات يتبعه Refactoring، بينما ATDD يشتق الاختبارات من Acceptance criteria.",
             qEn = "Which statement BEST characterizes Test-Driven Development (TDD)?",
-            correctEn = "Writing a failing component test first, then writing just enough code to pass it and refactoring",
+            correctEn = "Writing a failing unit test before minimal code",
             wrongEn = listOf(
-                "Writing the full application code first and authoring acceptance tests after release",
-                "Replacing automated unit tests entirely with unscripted manual exploratory testing",
-                "Deferring all test case design until system integration testing is completed"
+                "Writing full application code first and acceptance tests post-launch",
+                "Replacing automated unit tests completely with manual exploration",
+                "Deferring test design until system integration is fully completed"
             ),
             expEn = "TDD is a test-first approach (Red → Green → Refactor) at the component level, whereas ATDD derives tests from acceptance criteria."
         ),
         RawQ(
             id = "q062", ch = 2,
             q = "أي ممارسة تجسّد مفهوم Shift-left في دورة حياة تطوير البرمجيات؟",
-            correct = "مراجعة المتطلبات مبكراً وكتابة حالات الاختبار قبل كتابة الكود وتشغيل Static analysis",
+            correct = "مراجعة المتطلبات مبكراً وكتابة الاختبارات قبل الكود",
             wrong = listOf(
-                "زيادة عدد المختبرين اليدويين في الأسبوع الأخير قبل الإطلاق فقط",
-                "إلغاء اختبارات الوحدة والمكونات والاعتماد على Beta testing وحده",
-                "تأجيل فحص الأمان والأداء إلى مرحلة صيانة النظام بعد التسليم"
+                "زيادة عدد المختبرين اليدويين في الأسبوع الأخير قبل الإطلاق الإنتاجي فقط",
+                "إلغاء اختبارات الوحدة والمكونات والاعتماد على Beta testing وحده للإطلاق",
+                "تأجيل فحص الأمان والأداء بالكامل إلى مرحلة صيانة النظام بعد التسليم"
             ),
             exp = "Shift-left يعني تقديم أنشطة الاختبار والمراجعات والـ Test-first إلى أبكر وقت ممكن في SDLC.",
             qEn = "Which of the following practices BEST exemplifies the 'shift-left' approach in the SDLC?",
-            correctEn = "Reviewing specifications early, writing tests before code, and running static analysis continuously",
+            correctEn = "Reviewing specs early and writing tests before coding",
             wrongEn = listOf(
-                "Adding extra manual testers only during the final week before production launch",
-                "Skipping unit and component tests to rely solely on external beta testing",
-                "Postponing security and performance evaluations until post-release maintenance"
+                "Adding extra manual testers during the final week before launch",
+                "Skipping unit and component tests to rely solely on external beta runs",
+                "Postponing security and performance checks until post-release upkeep"
             ),
             expEn = "Shift-left moves testing earlier in the lifecycle via early reviews, test-first practices (TDD/ATDD), CI, and non-functional checks early."
         ),
         RawQ(
             id = "q063", ch = 2,
             q = "ما الهدف الرئيسي من عقد Retrospectives في نهاية كل تكرار (Iteration)؟",
-            correct = "تقييم ما نجح وما تعثّر واستخلاص إجراءات لتحسين عمليات التطوير والاختبار",
+            correct = "تقييم النتائج واستخلاص إجراءات لتحسين العملية",
             wrong = listOf(
-                "محاسبة المختبرين على عدد العيوب التي وصلت إلى بيئة الاختبار",
-                "استبدال جميع وثائق الاختبار الرسمية بمحاضر شفوية غير متابعة",
-                "إعادة تنفيذ جميع اختبارات القبول السابقة يدوياً أمام العميل"
+                "محاسبة المختبرين على عدد العيوب التي وصلت إلى بيئة الاختبار الوظيفي",
+                "استبدال جميع وثائق الاختبار الرسمية بمحاضر شفوية غير متابعة لاحقاً",
+                "إعادة تنفيذ جميع اختبارات القبول السابقة يدوياً أمام العميل المباشر"
             ),
             exp = "تساعد الـ Retrospectives على التحسين المستمر لجودة العمليات والاختبارات وتقليل العيوب المتكررة.",
             qEn = "What is the primary purpose of holding retrospectives at the end of an iteration or project milestone?",
-            correctEn = "Evaluating what worked well and what needs improvement to define actionable process improvements",
+            correctEn = "Reviewing lessons learned to improve team processes",
             wrongEn = listOf(
-                "Assigning blame to testers for the number of defects detected during the sprint",
-                "Replacing all documented test artifacts with informal verbal status updates",
-                "Re-executing every prior acceptance test manually in front of the customer"
+                "Assigning personal blame for defects detected during the sprint",
+                "Replacing documented test artifacts with informal verbal updates",
+                "Re-executing every acceptance test manually before the customer"
             ),
             expEn = "Section 2.1.6: Retrospectives help teams continuously improve test effectiveness, defect prevention, and collaboration."
         ),
@@ -493,71 +493,71 @@ internal object QuestionsCh1To3 {
         RawQ(
             id = "q065", ch = 2,
             q = "تعديل دالة حساب الخصم تطلّب التأكد من أن شاشة الفاتورة وتصدير PDF لم يتأثرا. كيف يُصنَّف اختبار الشاشة والتصدير هنا؟",
-            correct = "Change-related testing (Regression testing)",
-            wrong = listOf("Non-functional portability testing", "Static informal review", "Acceptance contractual testing"),
+            correct = "Change-related (Regression)",
+            wrong = listOf("Non-functional portability testing", "Static informal document review", "Contractual acceptance validation"),
             exp = "التحقق من عدم حدوث آثار جانبية في مناطق لم تتغير مباشرة بعد تعديل الكود هو Regression testing.",
             qEn = "After modifying a discount calculation function, a tester checks that invoice rendering and PDF export remain intact. What is this testing called?",
-            correctEn = "Change-related testing (Regression testing)",
-            wrongEn = listOf("Non-functional portability testing", "Static informal review", "Contractual acceptance testing"),
+            correctEn = "Regression testing",
+            wrongEn = listOf("Non-functional portability check", "Static informal document review", "Contractual acceptance testing"),
             expEn = "Regression testing is change-related testing aimed at confirming unchanged features still work after modifications."
         ),
         RawQ(
             id = "q102", ch = 2,
             q = "كيف يؤثر اختيار نموذج SDLC التسلسلي (مثل Waterfall) مقارنة بالنماذج التكرارية على أنشطة الاختبار؟",
-            correct = "يبدأ الاختبار الديناميكي غالباً في مراحل متأخرة في النماذج التسلسلية بينما يتم باستمرار في التكرارية",
+            correct = "يبدأ Dynamic testing غالباً متأخراً في التسلسلي ومتواصلاً في التكراري",
             wrong = listOf(
-                "يلغي النموذج التسلسلي الحاجة إلى static testing ومراجعات الوثائق تماماً",
-                "يمنع النموذج التكراري إجراء أي اختبارات نظام أو اختبارات قبول نهائية",
-                "لا يتأثر توقيت الاختبار أو مستوى التوثيق بنوع نموذج دورة حياة التطوير"
+                "يلغي النموذج التسلسلي الحاجة إلى static testing ومراجعات الوثائق تماماً منذ البداية",
+                "يمنع النموذج التكراري إجراء أي اختبارات نظام أو اختبارات قبول نهائية قبل النشر",
+                "لا يتأثر توقيت الاختبار أو مستوى التوثيق مطلقاً بنوع نموذج دورة حياة التطوير"
             ),
             exp = "في النماذج التسلسلية يكون الاختبار الساكن مبكراً والديناميكي متأخراً، أما في التكرارية/الرشيقة فيختبر كل تكرار مبكراً وبوتيرة مستمرة.",
             qEn = "How does a sequential SDLC model (e.g., Waterfall) typically differ from an iterative model in terms of testing?",
-            correctEn = "Dynamic testing typically occurs later in sequential models, whereas iterative models test working increments continuously",
+            correctEn = "Dynamic testing occurs later in sequential models vs. each sprint",
             wrongEn = listOf(
-                "Sequential models completely eliminate static testing and early document reviews",
-                "Iterative models prohibit executing system-level or user acceptance testing",
-                "Testing schedules and documentation rigor are unaffected by the chosen SDLC model"
+                "Sequential models completely eliminate static testing and early specification reviews",
+                "Iterative models prohibit executing system-level or user acceptance testing cycles",
+                "Testing schedules and documentation depth are unaffected by the chosen SDLC"
             ),
             expEn = "Section 2.1.1: Sequential models defer dynamic testing until later phases; iterative/incremental models test small deliveries repeatedly."
         ),
         RawQ(
             id = "q103", ch = 2,
             q = "التحقق من سهولة نقل التطبيق للعمل من مزوّد سحابي (AWS) إلى مزوّد آخر (Azure) يُعد اختبار:",
-            correct = "Portability testing (Non-functional)",
-            wrong = listOf("Usability testing", "Functional suitability testing", "Confirmation testing"),
+            correct = "Portability testing",
+            wrong = listOf("Usability efficiency testing", "Functional suitability check", "Confirmation regression test"),
             exp = "Portability تقيس سهولة نقل النظام من بيئة أو بنية تحتية إلى أخرى، وهي ضمن Non-functional testing.",
             qEn = "Testing how easily an application can be transferred from one cloud infrastructure (AWS) to another (Azure) is an example of:",
-            correctEn = "Portability testing (Non-functional)",
-            wrongEn = listOf("Usability testing", "Functional suitability testing", "Confirmation testing"),
+            correctEn = "Portability testing",
+            wrongEn = listOf("Usability & UX evaluation", "Functional correctness test", "Confirmation defect re-test"),
             expEn = "Portability (ISO 25010 quality characteristic) evaluates ease of transferring a system between hardware, software, or operational environments."
         ),
         RawQ(
             id = "q104", ch = 2,
             q = "اختبار التحقق من النسخ الاحتياطي والاستعادة من الكوارث وإجراءات الصيانة التشغيلية قبل التسليم هو:",
-            correct = "Operational acceptance testing (OAT)",
-            wrong = listOf("Alpha testing", "Component integration testing", "Exploratory usability testing"),
+            correct = "Operational acceptance testing",
+            wrong = listOf("Customer beta field trial", "Component integration check", "Exploratory usability testing"),
             exp = "OAT ضمن مستويات Acceptance testing يتحقق من جاهزية فرق التشغيل: Backup/restore, Disaster recovery, User management, Maintenance.",
             qEn = "Testing backup/restore procedures, disaster recovery, and system administration tasks before go-live is known as:",
-            correctEn = "Operational acceptance testing (OAT)",
-            wrongEn = listOf("Alpha testing", "Component integration testing", "Exploratory usability testing"),
+            correctEn = "Operational acceptance testing",
+            wrongEn = listOf("Early internal alpha testing", "Component integration testing", "Exploratory usability checking"),
             expEn = "Operational acceptance testing (Section 2.2.1) evaluates operational readiness by administrators/operators, including backup, failover, and security checks."
         ),
         RawQ(
             id = "q105", ch = 2,
             q = "أي عامل مما يلي يجعل إجراء Impact analysis في Maintenance testing صعباً ومكلفاً؟",
-            correct = "غياب التوثيق المحدّث أو انعدام الـ Traceability بين المتطلبات والكود والاختبارات",
+            correct = "تقادم المواصفات أو غياب الـ Traceability بين الأصول",
             wrong = listOf(
                 "وجود اختبارات انحدار آلية مرتبطة بأسماء الميزات في مستودع العمل",
-                "تنفيذ النظام على بيئة سحابية حديثة تدعم الحاويات",
-                "إصدار النظام وفق جدول صيانة مخطط له مسبقاً"
+                "تنفيذ النظام على بيئة سحابية حديثة تدعم الحاويات والعزل البرمجي",
+                "إصدار النظام وفق جدول صيانة مخطط له مسبقاً مع فرق التشغيل"
             ),
             exp = "القسم 2.3: يصعب تحليل الأثر عند تقادم المواصفات أو فقدان الـ traceability أو عدم فهم بنية الكود القديم.",
             qEn = "Which of the following makes impact analysis especially difficult during maintenance testing?",
-            correctEn = "Missing or outdated specifications and lack of traceability between requirements, code, and tests",
+            correctEn = "Outdated specs or missing traceability links",
             wrongEn = listOf(
-                "Having automated regression suites linked clearly to feature identifiers",
-                "Running the operational system inside modern containerized cloud clusters",
-                "Scheduling enhancements as part of a planned release-based maintenance cycle"
+                "Automated regression suites linked clearly to feature specs",
+                "Running the operational system in modern containerized clouds",
+                "Scheduling enhancements inside a planned maintenance cycle"
             ),
             expEn = "Section 2.3 explicitly warns that impact analysis is difficult when specifications are out of date or missing, or when traceability was not maintained."
         ),
@@ -608,11 +608,11 @@ internal object QuestionsCh1To3 {
             id = "q022", ch = 3,
             q = "من المسؤول عن إدارة اجتماع المراجعة وتهيئة بيئة آمنة للنقاش؟",
             correct = "Moderator (Facilitator)",
-            wrong = listOf("Author", "Scribe (Recorder)", "Manager"),
+            wrong = listOf("Author (Content creator)", "Scribe / Note Recorder", "Senior Resource Manager"),
             exp = "الـ Facilitator يدير الاجتماع، والـ Scribe يوثق، والـ Author مؤلف المنتج المُراجَع.",
             qEn = "Which review role is responsible for running review meetings effectively and ensuring a safe space for discussion?",
             correctEn = "Moderator (Facilitator)",
-            wrongEn = listOf("Author", "Scribe (Recorder)", "Manager"),
+            wrongEn = listOf("Author of the work product", "Scribe / Minutes Recorder", "Senior Project Manager"),
             expEn = "CTFL v4.0 Section 3.2.3: The moderator (facilitator) runs meetings, mediates discussions, manages time, and fosters a psychologically safe atmosphere."
         ),
         RawQ(
@@ -637,19 +637,19 @@ internal object QuestionsCh1To3 {
         RawQ(
             id = "q024", ch = 3,
             q = "ما الفارق الجوهري الصحيح بين Static وDynamic testing؟",
-            correct = "Static يكشف الـ defects مباشرة في المنتج، بينما Dynamic يكشف الـ failures عند التنفيذ",
+            correct = "Static يكشف الـ defects مباشرة؛ Dynamic يكشف الـ failures",
             wrong = listOf(
-                "Static يكشف الـ failures في الإنتاج، بينما Dynamic يفحص الوثائق دون تشغيل",
+                "Static يكشف أعطال التشغيل في الإنتاج؛ Dynamic يفحص الوثائق دون تنفيذها",
                 "كلاهما يتطلب بيئة تشغيل متكاملة لتنفيذ الشيفرة المصدرية وقياس المخرجات",
-                "Dynamic لا يعتمد على test basis، بينما Static يقتصر على اختبار الأداء"
+                "Dynamic لا يعتمد على test basis؛ بينما Static يقتصر على اختبار الأداء"
             ),
             exp = "التنفيذ هو الفارق: Dynamic يظهر failures أثناء التشغيل، وStatic يفحص work product مباشرة.",
             qEn = "Which statement BEST captures the difference between static testing and dynamic testing?",
-            correctEn = "Static testing finds defects directly in work products without execution, while dynamic testing finds failures during execution",
+            correctEn = "Static finds defects directly; dynamic triggers runtime failures",
             wrongEn = listOf(
-                "Static testing detects runtime failures in production, while dynamic testing inspects documents offline",
-                "Both static and dynamic testing require deploying executable binaries into a live test environment",
-                "Dynamic testing requires no test basis, while static testing evaluates only runtime performance"
+                "Static testing detects production crashes; dynamic inspects documents offline",
+                "Both approaches require deploying compiled binaries into a live environment",
+                "Dynamic testing needs no test basis; static testing evaluates response speed"
             ),
             expEn = "Dynamic testing executes code to trigger failures; static testing examines work products directly to find defects early."
         ),
@@ -678,19 +678,19 @@ internal object QuestionsCh1To3 {
         RawQ(
             id = "q068", ch = 3,
             q = "أي عامل يُضعف فرص نجاح عملية المراجعة الرسمية في الفريق؟",
-            correct = "تحويل المراجعة إلى وسيلة لتقييم أداء المؤلف وعقابه بدلاً من تحسين المنتج",
+            correct = "تحويل المراجعة لأداة لتقييم المؤلف ومعاقبته شخصياً",
             wrong = listOf(
-                "تقسيم الوثائق الكبيرة إلى أجزاء صغيرة سهلة التركيز",
-                "تزويد المراجعين بقوائم فحص محددة ومحدثة للمخاطر",
-                "منح المشاركين وقتاً كافياً للتحضير والمراجعة الفردية"
+                "تقسيم الوثائق الكبيرة إلى أجزاء صغيرة سهلة التركيز والفحص",
+                "تزويد المراجعين بقوائم فحص محددة ومحدثة للمخاطر الهندسية",
+                "منح المشاركين وقتاً كافياً للتحضير والمراجعة الفردية المسبقة"
             ),
             exp = "البيئة الخالية من اللوم (Trust & non-judgmental culture) ركيزة أساسية لنجاح المراجعات.",
             qEn = "Which of the following factors is MOST likely to undermine the success of a review process?",
-            correctEn = "Using review defect counts to evaluate and penalize the author's personal performance",
+            correctEn = "Using defect counts to penalize the author",
             wrongEn = listOf(
-                "Splitting large work products into small, manageable chunks for focused reading",
-                "Providing reviewers with tailored, risk-focused checklists during initiation",
-                "Allocating sufficient scheduled time for participants to prepare individually"
+                "Splitting large work products into small manageable chunks",
+                "Providing reviewers with tailored risk-focused checklists",
+                "Allocating sufficient scheduled time for individual review"
             ),
             expEn = "Section 3.2.5: Reviews require an atmosphere of trust; the outcome must never be used to evaluate participants."
         ),
@@ -708,19 +708,19 @@ internal object QuestionsCh1To3 {
         RawQ(
             id = "q106", ch = 3,
             q = "أي عبارة حول نطاق Static testing هي الأدق وفق CTFL v4.0؟",
-            correct = "يمكن إخضاع أي منتج عمل تقريباً للمراجعة الساكنة، بما فيها المتطلبات والاختبارات والكود والخطط",
+            correct = "يمكن فحص معظم منتجات العمل بما فيها المتطلبات والكود والخطط",
             wrong = listOf(
-                "يقتصر Static testing على ملفات الشيفرة المصدرية المكتوبة بلغات مُصرَّفة (Compiled)",
+                "يقتصر Static testing على ملفات الشيفرة المصدرية المكتوبة بلغات مُصرَّفة فقط",
                 "لا يمكن فحص خطط الاختبار أو قصص المستخدمين إلا عبر Dynamic execution",
                 "المنتجات المكتوبة بلغة طبيعية لا تناسب المراجعات الساكنة بسبب غياب المترجم"
             ),
             exp = "القسم 3.1.1: يمكن فحص معظم work products بـ Static testing (مواصفات، قصص مستخدمين، خطط، حالات اختبار، كود، عقود).",
             qEn = "Which of the following statements about the scope of static testing in CTFL v4.0 is MOST accurate?",
-            correctEn = "Almost any work product can be examined by static testing, including requirements, user stories, test plans, and code",
+            correctEn = "Almost any work product can be statically checked, from code to plans",
             wrongEn = listOf(
                 "Static testing is restricted exclusively to compiled source code modules",
-                "Test plans and user stories can only be verified through dynamic test execution",
-                "Natural-language specifications cannot undergo static testing due to lack of a compiler"
+                "Test plans and user stories can only be verified via dynamic test execution",
+                "Natural-language specifications cannot undergo static testing without a compiler"
             ),
             expEn = "Section 3.1.1 states that almost any work product (requirements, designs, code, testware, user stories, contracts) can be examined using reviews."
         ),
@@ -757,11 +757,11 @@ internal object QuestionsCh1To3 {
             ),
             exp = "المراجعة التقنية يشارك فيها خبراء تقنيون (Peers) وميسّر لتحقيق التوافق واتخاذ قرارات حول مسائل تقنية واكتشاف العيوب.",
             qEn = "What is a primary distinguishing purpose of a 'technical review' compared to an informal review?",
-            correctEn = "Gaining consensus and making technical decisions through evaluation by technically qualified peers",
+            correctEn = "Building consensus and deciding technical issues with qualified peers",
             wrongEn = listOf(
-                "Avoiding any individual preparation or written records to keep sessions under five minutes",
-                "Training non-technical end users on how to navigate the released user interface",
-                "Relying solely on the author to unilaterally resolve defects without peer input"
+                "Avoiding individual preparation or records to keep meetings under five minutes",
+                "Training non-technical end users on navigating the released user interface",
+                "Relying solely on the author to unilaterally resolve issues without peer input"
             ),
             expEn = "A technical review involves technically qualified reviewers and a moderator to evaluate quality, solve technical problems, and gain consensus."
         )

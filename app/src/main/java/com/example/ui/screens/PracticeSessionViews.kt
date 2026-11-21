@@ -29,10 +29,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,11 +71,15 @@ fun PracticeSessionView(
     BackHandler { onExit() }
 
     val qa = LocalQaColors.current
-    var idx by remember { mutableIntStateOf(0) }
-    var selectedDisplayIdx by remember { mutableStateOf<Int?>(null) }
-    var score by remember { mutableIntStateOf(0) }
-    var useEnglish by remember { mutableStateOf(initialEnglish) }
-    val wrongList = remember { mutableStateListOf<PreparedQuestion>() }
+    val sessionKey = remember(qs) { qs.joinToString(",") { "${it.question.id}:${it.order.joinToString("")}" } }
+    var idx by rememberSaveable(sessionKey) { mutableIntStateOf(0) }
+    var selectedDisplayIdx by rememberSaveable(sessionKey) { mutableStateOf<Int?>(null) }
+    var score by rememberSaveable(sessionKey) { mutableIntStateOf(0) }
+    var useEnglish by rememberSaveable(sessionKey) { mutableStateOf(initialEnglish) }
+    val wrongIndices = rememberSaveable(sessionKey, saver = PracticeSessionPersistence.IntListSaver) {
+        mutableStateListOf<Int>()
+    }
+    val wrongList = wrongIndices.mapNotNull { qs.getOrNull(it) }
 
     val q = qs.getOrNull(idx)
     if (q == null) {
@@ -213,7 +219,7 @@ fun PracticeSessionView(
                                     selectedDisplayIdx = displayIdx
                                     val ok = displayIdx == q.correctIdx
                                     viewModel.recordAttempt(q.question.id, ok, "practice")
-                                    if (ok) score++ else wrongList.add(q)
+                                    if (ok) score++ else if (idx !in wrongIndices) wrongIndices.add(idx)
                                 },
                             shape = RoundedCornerShape(10.dp),
                             color = bg,
@@ -285,20 +291,29 @@ fun ExamSessionView(
     initialEnglish: Boolean = false
 ) {
     val qa = LocalQaColors.current
-    val answers = remember(qs) { mutableStateListOf<Int?>().apply { repeat(qs.size) { add(null) } } }
-    val flags = remember(qs) { mutableStateMapOf<Int, Boolean>() }
-    var idx by remember { mutableIntStateOf(0) }
-    var leftSec by remember { mutableIntStateOf(minutes * 60) }
-    var done by remember { mutableStateOf(false) }
-    var showConfirmSubmit by remember { mutableStateOf(false) }
-    var showConfirmCancel by remember { mutableStateOf(false) }
-    var elapsedSec by remember { mutableIntStateOf(0) }
-    var useEnglish by remember { mutableStateOf(initialEnglish) }
-    val startAtMs = remember { System.currentTimeMillis() }
+    val sessionKey = remember(qs) { qs.joinToString(",") { "${it.question.id}:${it.order.joinToString("")}" } }
+    val answers = rememberSaveable(sessionKey, saver = PracticeSessionPersistence.answersSaver(qs.size)) {
+        mutableStateListOf<Int?>().apply { repeat(qs.size) { add(null) } }
+    }
+    val flags = rememberSaveable(sessionKey, saver = PracticeSessionPersistence.FlagsSaver) {
+        mutableStateMapOf<Int, Boolean>()
+    }
+    var idx by rememberSaveable(sessionKey) { mutableIntStateOf(0) }
+    var done by rememberSaveable(sessionKey) { mutableStateOf(false) }
+    var showConfirmSubmit by rememberSaveable(sessionKey) { mutableStateOf(false) }
+    var showConfirmCancel by rememberSaveable(sessionKey) { mutableStateOf(false) }
+    var elapsedSec by rememberSaveable(sessionKey) { mutableIntStateOf(0) }
+    var useEnglish by rememberSaveable(sessionKey) { mutableStateOf(initialEnglish) }
+    val startAtMs by rememberSaveable(sessionKey) { mutableLongStateOf(System.currentTimeMillis()) }
+    var leftSec by remember(sessionKey, startAtMs, minutes) {
+        mutableIntStateOf(PracticeSessionPersistence.computeRemainingSeconds(startAtMs, minutes))
+    }
 
     fun submitExam() {
         if (done) return
-        val used = ((System.currentTimeMillis() - startAtMs) / 1000.0).roundToInt().coerceIn(0, minutes * 60)
+        showConfirmSubmit = false
+        showConfirmCancel = false
+        val used = PracticeSessionPersistence.computeElapsedSeconds(startAtMs, minutes)
         elapsedSec = used
         var score = 0
         val breakdownCounts = mutableMapOf<String, Pair<Int, Int>>()
@@ -343,17 +358,16 @@ fun ExamSessionView(
         )
     }
 
-    LaunchedEffect(done) {
+    LaunchedEffect(done, startAtMs) {
         if (done) return@LaunchedEffect
-        val endMs = startAtMs + minutes * 60_000L
         while (!done) {
-            delay(500)
-            val l = ((endMs - System.currentTimeMillis()) / 1000.0).roundToInt().coerceAtLeast(0)
+            val l = PracticeSessionPersistence.computeRemainingSeconds(startAtMs, minutes)
             leftSec = l
             if (l <= 0) {
                 submitExam()
                 break
             }
+            delay(500)
         }
     }
 
