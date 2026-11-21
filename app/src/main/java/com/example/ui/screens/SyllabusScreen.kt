@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material3.CircularProgressIndicator
@@ -27,6 +28,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.data.SyllabusData
+import com.example.data.ZatonaData
 import com.example.model.AppState
 import com.example.model.TopicStatus
 import com.example.ui.QaViewModel
@@ -178,6 +183,84 @@ fun SyllabusScreen(
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 QaProgressBar(pct = chPct)
+                val nextChapterTopic = chapter.topics.firstOrNull {
+                    TopicStatus.fromKey(StatsUtils.topicStatus(state, it.id)) != TopicStatus.DONE
+                } ?: chapter.topics.firstOrNull()
+                val zatona = ZatonaData.forChapter(chapter.id)
+                var showZatona by rememberSaveable(chapter.id) { mutableStateOf(false) }
+
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (zatona != null) {
+                        Surface(
+                            modifier = Modifier
+                                .minimumInteractiveComponentSize()
+                                .clip(RoundedCornerShape(999.dp))
+                                .clickable { showZatona = !showZatona }
+                                .testTag("syllabus_zatona_${chapter.id}"),
+                            shape = RoundedCornerShape(999.dp),
+                            color = if (showZatona) qa.warnBg else MaterialTheme.colorScheme.background,
+                            border = BorderStroke(1.dp, if (showZatona) qa.warn else qa.border)
+                        ) {
+                            Text(
+                                text = if (showZatona) "إخفاء الزتونة ▲" else "🥥 الزتونة",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = if (showZatona) qa.warn else MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                            )
+                        }
+                    }
+                    if (nextChapterTopic != null) {
+                        Surface(
+                            modifier = Modifier
+                                .minimumInteractiveComponentSize()
+                                .clip(RoundedCornerShape(999.dp))
+                                .clickable { onOpenTopic(nextChapterTopic.id) }
+                                .testTag("syllabus_enter_chapter_${chapter.id}"),
+                            shape = RoundedCornerShape(999.dp),
+                            color = MaterialTheme.colorScheme.primaryContainer,
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.45f))
+                        ) {
+                            Text(
+                                text = "دخول الفصل (${nextChapterTopic.id}) ←",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                            )
+                        }
+                    }
+                }
+                if (showZatona && zatona != null) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Surface(
+                        shape = RoundedCornerShape(10.dp),
+                        color = MaterialTheme.colorScheme.background,
+                        border = BorderStroke(1.dp, qa.border),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(modifier = Modifier.padding(10.dp)) {
+                            Text(
+                                text = zatona.title,
+                                style = MaterialTheme.typography.labelLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            zatona.coreSummary.forEach { line ->
+                                Text("• $line", style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(bottom = 3.dp))
+                            }
+                            zatona.keyFormulasAndDiffs.forEach { (k, v) ->
+                                Text("▪ $k: $v", style = MaterialTheme.typography.labelSmall, color = qa.muted, modifier = Modifier.padding(bottom = 2.dp))
+                            }
+                        }
+                    }
+                }
                 Spacer(modifier = Modifier.height(8.dp))
 
                 chapter.topics.forEachIndexed { idx, topic ->
@@ -235,6 +318,12 @@ fun SyllabusScreen(
                             text = "${topic.minutes} د",
                             style = MaterialTheme.typography.labelSmall,
                             color = qa.muted
+                        )
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                            contentDescription = "فتح درس ${topic.id}",
+                            tint = qa.muted,
+                            modifier = Modifier.size(18.dp)
                         )
                     }
                 }

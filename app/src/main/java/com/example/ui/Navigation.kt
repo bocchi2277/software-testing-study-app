@@ -99,9 +99,9 @@ import kotlinx.serialization.Serializable
 @Serializable data class PracticeRoute(val ch: Int? = null, val mode: String? = null)
 @Serializable object CardsRoute
 @Serializable object PlanRoute
-@Serializable object ResourcesRoute
-@Serializable object LabRoute
-@Serializable object SkillsRoute
+@Serializable data class ResourcesRoute(val chapter: Int? = null)
+@Serializable data class LabRoute(val tool: String? = null)
+@Serializable data class SkillsRoute(val section: String? = null)
 @Serializable object CertificateRoute
 @Serializable object CareerRoute
 @Serializable object GlossaryRoute
@@ -124,9 +124,9 @@ val ALL_SECTIONS = listOf(
     NavSection(PlanRoute, "الخطة والجدول", "🗓️", Icons.Filled.CalendarMonth, "nav_plan"),
     NavSection(PracticeRoute(), "اختبارات", "📝", Icons.Filled.Quiz, "nav_practice"),
     NavSection(CardsRoute, "البطاقات", "🃏", Icons.Filled.Style, "nav_cards"),
-    NavSection(ResourcesRoute, "المصادر", "🔗", Icons.Filled.School, "nav_resources"),
-    NavSection(LabRoute, "المختبر التفاعلي", "🧪", Icons.Filled.Science, "nav_lab"),
-    NavSection(SkillsRoute, "المهارات العملية", "🛠️", Icons.Filled.Build, "nav_skills"),
+    NavSection(ResourcesRoute(), "المصادر", "🔗", Icons.Filled.School, "nav_resources"),
+    NavSection(LabRoute(), "المختبر التفاعلي", "🧪", Icons.Filled.Science, "nav_lab"),
+    NavSection(SkillsRoute(), "المهارات العملية", "🛠️", Icons.Filled.Build, "nav_skills"),
     NavSection(CertificateRoute, "شهادة ISTQB", "🎓", Icons.Filled.WorkspacePremium, "nav_certificate"),
     NavSection(CareerRoute, "المسار المهني", "🚀", Icons.Filled.RocketLaunch, "nav_career"),
     NavSection(GlossaryRoute, "القاموس", "📖", Icons.Filled.MenuBook, "nav_glossary"),
@@ -364,8 +364,9 @@ fun QaAppShell(
                                     },
                                     onOpenPractice = { ch -> navController.navigate(PracticeRoute(ch = ch)) },
                                     onOpenCards = { navController.navigateTopLevel(CardsRoute) },
-                                    onOpenLab = { navController.navigate(LabRoute) },
-                                    onOpenResources = { navController.navigate(ResourcesRoute) }
+                                    onOpenLab = { tool -> navController.navigate(LabRoute(tool)) },
+                                    onOpenSkills = { section -> navController.navigate(SkillsRoute(section)) },
+                                    onOpenResources = { navController.navigate(ResourcesRoute()) }
                                 )
                             }
                             composable<PracticeRoute> { entry ->
@@ -393,14 +394,21 @@ fun QaAppShell(
                                     onNavigateSection = { route -> navController.navigateTopLevel(route) }
                                 )
                             }
-                            composable<ResourcesRoute> {
-                                ResourcesScreen(state = state, viewModel = viewModel)
+                            composable<ResourcesRoute> { entry ->
+                                val args = entry.toRoute<ResourcesRoute>()
+                                ResourcesScreen(
+                                    state = state,
+                                    viewModel = viewModel,
+                                    initialChapter = args.chapter
+                                )
                             }
-                            composable<LabRoute> {
-                                LabScreen()
+                            composable<LabRoute> { entry ->
+                                val args = entry.toRoute<LabRoute>()
+                                LabScreen(initialTool = args.tool)
                             }
-                            composable<SkillsRoute> {
-                                SkillsScreen()
+                            composable<SkillsRoute> { entry ->
+                                val args = entry.toRoute<SkillsRoute>()
+                                SkillsScreen(initialSection = args.section)
                             }
                             composable<CertificateRoute> {
                                 CertificateScreen(

@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
@@ -45,6 +46,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -96,10 +98,10 @@ fun Roadmap(
     initiallyExpandedChapterId: Int? = null
 ) {
     val qa = LocalQaColors.current
-    var expandedChapterId by remember(initiallyExpandedChapterId) {
+    var expandedChapterId by rememberSaveable(initiallyExpandedChapterId) {
         mutableStateOf(initiallyExpandedChapterId)
     }
-    var searchQuery by remember { mutableStateOf("") }
+    var searchQuery by rememberSaveable { mutableStateOf("") }
     val trimmedQuery = searchQuery.trim()
     var collapsedInSearch by remember(trimmedQuery) { mutableStateOf(emptySet<Int>()) }
 
@@ -659,6 +661,53 @@ private fun ChronologicalRoadmapRow(
                         )
                     }
 
+                    val nextChapterTopic = entry.displayedTopics.firstOrNull {
+                        TopicStatus.fromKey(StatsUtils.topicStatus(state, it.id)) != TopicStatus.DONE
+                    } ?: entry.displayedTopics.firstOrNull() ?: chapter.topics.firstOrNull()
+
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = if (isExpanded) {
+                                "اضغط على أي موضوع لقراءته"
+                            } else {
+                                "عرض الدروس (${entry.displayedTopics.size})"
+                            },
+                            style = MaterialTheme.typography.labelSmall,
+                            color = qa.muted,
+                            modifier = Modifier.weight(1f)
+                        )
+                        if (nextChapterTopic != null) {
+                            val enterLabel = when (moduleState) {
+                                ChronologicalModuleState.COMPLETED -> "مراجعة الفصل ←"
+                                ChronologicalModuleState.IN_PROGRESS -> "متابعة (${nextChapterTopic.id}) ←"
+                                ChronologicalModuleState.NOT_STARTED -> "دخول الفصل ←"
+                            }
+                            Surface(
+                                modifier = Modifier
+                                    .minimumInteractiveComponentSize()
+                                    .clip(RoundedCornerShape(999.dp))
+                                    .clickable { onOpenTopic(nextChapterTopic.id) }
+                                    .testTag("roadmap_enter_chapter_${chapter.id}"),
+                                shape = RoundedCornerShape(999.dp),
+                                color = MaterialTheme.colorScheme.primaryContainer,
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.45f))
+                            ) {
+                                Text(
+                                    text = enterLabel,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                                )
+                            }
+                        }
+                    }
+
                     // Expandable Topic Checklist
                     AnimatedVisibility(visible = isExpanded) {
                         Column(
@@ -723,6 +772,12 @@ private fun ChronologicalRoadmapRow(
                                         text = "${topic.minutes} د",
                                         style = MaterialTheme.typography.labelSmall,
                                         color = qa.muted
+                                    )
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                                        contentDescription = "فتح درس ${topic.id}",
+                                        tint = qa.muted,
+                                        modifier = Modifier.size(18.dp)
                                     )
                                 }
                             }

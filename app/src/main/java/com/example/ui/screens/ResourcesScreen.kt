@@ -22,10 +22,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -42,29 +44,62 @@ import com.example.ui.theme.LocalQaColors
 @Composable
 fun ResourcesScreen(
     state: AppState,
-    viewModel: QaViewModel
+    viewModel: QaViewModel,
+    initialChapter: Int? = null
 ) {
     val qa = LocalQaColors.current
     val context = LocalContext.current
 
-    var cat by remember { mutableStateOf("الكل") }
-    var query by remember { mutableStateOf("") }
-    var level by remember { mutableStateOf("الكل") }
-    var lang by remember { mutableStateOf("الكل") }
-    var only by remember { mutableStateOf("") } // "", "top", "saved", "done"
+    var cat by rememberSaveable { mutableStateOf("الكل") }
+    var query by rememberSaveable { mutableStateOf("") }
+    var level by rememberSaveable { mutableStateOf("الكل") }
+    var lang by rememberSaveable { mutableStateOf("الكل") }
+    var only by rememberSaveable { mutableStateOf("") } // "", "top", "saved", "done"
+    var chapterFilter by rememberSaveable(initialChapter) {
+        mutableStateOf(
+            if (initialChapter != null && initialChapter in 1..6) initialChapter.toString() else "الكل"
+        )
+    }
 
-    val list = remember(cat, query, level, lang, only, state.progress) {
+    val selectedChapter = chapterFilter.toIntOrNull()
+
+    val list = remember(cat, query, level, lang, only, chapterFilter, state.progress) {
         val s = query.trim().lowercase()
-        ResourcesData.RESOURCES.filter { r ->
-            (cat == "الكل" || r.cat == cat) &&
+        val filtered = ResourcesData.RESOURCES.filter { r ->
+            val chapterMatch = when {
+                chapterFilter == "الكل" -> true
+                chapterFilter == "general" -> r.isGeneral || r.ch.isEmpty()
+                selectedChapter != null -> selectedChapter in r.ch
+                else -> true
+            }
+            chapterMatch &&
+                (cat == "الكل" || r.cat == cat) &&
                 (level == "الكل" || r.level == level) &&
                 (lang == "الكل" || r.lang == (if (lang == "عربي") "ar" else "en")) &&
                 (s.isEmpty() || r.title.lowercase().contains(s) || r.desc.lowercase().contains(s)) &&
                 (only.isEmpty() || (if (only == "top") r.top else state.progress["r:${r.id}"] == only))
         }
+        if (selectedChapter != null) {
+            filtered.sortedBy { if (it.isGeneral) 1 else 0 }
+        } else {
+            filtered
+        }
     }
 
+    val arCount = remember { ResourcesData.RESOURCES.count { it.lang == "ar" } }
+    val enCount = remember { ResourcesData.RESOURCES.count { it.lang == "en" } }
     val doneCount = ResourcesData.RESOURCES.count { state.progress["r:${it.id}"] == "done" }
+
+    val sortedList = remember(list, selectedChapter) {
+        if (selectedChapter != null) {
+            list.sortedWith(
+                compareBy<com.example.data.StudyResource> { if (it.isGeneral) 1 else 0 }
+                    .thenBy { if (it.lang == "ar") 0 else 1 }
+            )
+        } else {
+            list
+        }
+    }
 
     LazyColumn(
         contentPadding = PaddingValues(16.dp),
@@ -80,8 +115,37 @@ fun ResourcesScreen(
                 onValueChange = { query = it },
                 placeholder = { Text("ابحث في المصادر…") },
                 singleLine = true,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("resources_search_input")
             )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                QaFilterChip(
+                    text = "كل الفصول",
+                    selected = chapterFilter == "الكل",
+                    onClick = { chapterFilter = "الكل" },
+                    testTag = "res_ch_all"
+                )
+                (1..6).forEach { c ->
+                    QaFilterChip(
+                        text = "فصل $c",
+                        selected = chapterFilter == c.toString(),
+                        onClick = { chapterFilter = if (chapterFilter == c.toString()) "الكل" else c.toString() },
+                        testTag = "res_ch_$c"
+                    )
+                }
+                QaFilterChip(
+                    text = "عام للمنهج",
+                    selected = chapterFilter == "general",
+                    onClick = { chapterFilter = if (chapterFilter == "general") "الكل" else "general" },
+                    testTag = "res_ch_general"
+                )
+            }
             Spacer(modifier = Modifier.height(8.dp))
 
             FlowRow(
@@ -91,15 +155,18 @@ fun ResourcesScreen(
                 listOf("الكل", "مبتدئ", "متوسط", "متقدم").forEach { lv ->
                     QaFilterChip(lv, level == lv, { level = lv })
                 }
-                listOf("الكل", "عربي", "English").forEach { lg ->
-                    val selected = lang == lg && !(lg == "الكل")
-                    if (lg != "الكل") {
-                        QaFilterChip(lg, lang == lg, { lang = if (lang == lg) "الكل" else lg })
-                    } else if (false) {
-                        Unit
-                    }
-                    if (selected) Unit
-                }
+                QaFilterChip(
+                    text = "عربي ($arCount)",
+                    selected = lang == "عربي",
+                    onClick = { lang = if (lang == "عربي") "الكل" else "عربي" },
+                    testTag = "res_lang_ar"
+                )
+                QaFilterChip(
+                    text = "English ($enCount)",
+                    selected = lang == "English",
+                    onClick = { lang = if (lang == "English") "الكل" else "English" },
+                    testTag = "res_lang_en"
+                )
             }
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -123,25 +190,44 @@ fun ResourcesScreen(
             }
         }
 
-        if (list.isEmpty()) {
+        if (sortedList.isEmpty()) {
             item {
                 Text("لا نتائج مطابقة.", color = qa.muted, modifier = Modifier.padding(16.dp))
             }
         }
 
-        items(list, key = { it.id }) { r ->
+        items(sortedList, key = { it.id }) { r ->
             val mark = state.progress["r:${r.id}"] ?: ""
             SectionCard(modifier = Modifier.alpha(if (mark == "done") 0.7f else 1f)) {
-                FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    listOf(r.cat, r.level, if (r.lang == "ar") "عربي" else "EN").forEach { tag ->
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    val scopeLabel = when {
+                        r.isGeneral -> "عام للمنهج"
+                        r.ch.isNotEmpty() -> "فصل ${r.ch.joinToString("،")}"
+                        else -> "عام للمهارات"
+                    }
+                    val langLabel = if (r.lang == "ar") "عربي" else "EN"
+                    listOf(langLabel, r.cat, r.level, scopeLabel).forEach { tag ->
+                        val (bg, fg, bold) = when (tag) {
+                            "عربي" -> Triple(qa.okBg, qa.ok, true)
+                            "ملخصات ومستودعات" -> Triple(
+                                MaterialTheme.colorScheme.primaryContainer,
+                                MaterialTheme.colorScheme.onPrimaryContainer,
+                                true
+                            )
+                            else -> Triple(MaterialTheme.colorScheme.background, qa.muted, false)
+                        }
                         Surface(
                             shape = RoundedCornerShape(4.dp),
-                            color = MaterialTheme.colorScheme.background
+                            color = bg
                         ) {
                             Text(
                                 text = tag,
                                 fontSize = 11.sp,
-                                color = qa.muted,
+                                fontWeight = if (bold) FontWeight.Bold else FontWeight.Normal,
+                                color = fg,
                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                             )
                         }

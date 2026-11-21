@@ -15,7 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -164,12 +164,16 @@ private val SKILL_SECTIONS = listOf(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun SkillsScreen() {
+fun SkillsScreen(initialSection: String? = null) {
     val qa = LocalQaColors.current
     @Suppress("DEPRECATION")
     val clipboard = LocalClipboardManager.current
-    var selectedId by remember { mutableStateOf("tc") }
-    var copied by remember { mutableStateOf(false) }
+    var selectedId by rememberSaveable(initialSection) {
+        mutableStateOf(
+            SKILL_SECTIONS.firstOrNull { it.id == initialSection }?.id ?: "tc"
+        )
+    }
+    var copied by rememberSaveable(selectedId) { mutableStateOf(false) }
     val section = SKILL_SECTIONS.first { it.id == selectedId }
 
     LazyColumn(
